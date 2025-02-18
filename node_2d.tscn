@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://cyploorq01ywt"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qjegi"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_ixlul"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gf1qx"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_qjegi")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="CollisionShape2D"]
+mesh = SubResource("SphereMesh_ixlul")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionShape2D/MeshInstance2D"]
+shape = SubResource("CircleShape2D_gf1qx")
+
+[node name="Camera2D" type="Camera2D" parent="."]
