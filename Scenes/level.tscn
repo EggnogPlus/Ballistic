@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://bmgxsvwcpisca"]
+
+[ext_resource type="PackedScene" uid="uid://cyploorq01ywt" path="res://Scenes/player.tscn" id="1_lt5lq"]
+
+[node name="Level" type="Node2D"]
+
+[node name="bg" type="Sprite2D" parent="."]
+position = Vector2(489, 732)
+scale = Vector2(21.3281, 12.4062)
+
+[node name="Player" parent="." instance=ExtResource("1_lt5lq")]
+position = Vector2(537, 281)
