@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bmgxsvwcpisca"]
 
-[ext_resource type="PackedScene" uid="uid://cyploorq01ywt" path="res://Scenes/player.tscn" id="1_lt5lq"]
+[ext_resource type="PackedScene" uid="uid://braj8e5h444ub" path="res://Scenes/ball.tscn" id="1_rrr6d"]
 
 [node name="Level" type="Node2D"]
 
@@ -8,5 +8,5 @@
 position = Vector2(489, 732)
 scale = Vector2(21.3281, 12.4062)
 
-[node name="Player" parent="." instance=ExtResource("1_lt5lq")]
-position = Vector2(537, 281)
+[node name="CharacterBody2D" parent="." instance=ExtResource("1_rrr6d")]
+position = Vector2(483, 307)
