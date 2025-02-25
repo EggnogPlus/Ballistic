@@ -11,8 +11,6 @@ var multix: float = 0 # Momentum Multiplier
 var velocity_vector: Vector2 = Vector2.ZERO
 var speed = 0
 
-# Previous Input Vector
-var current_vector = Vector2.ZERO
 
 # Time accumulator for momentum buildup
 var momentum_accumulator: float = 0.0
@@ -51,8 +49,6 @@ func _physics_process(delta):
 
 	# If there's input, apply force in that direction
 	if input_vector != Vector2.ZERO:
-		current_vector = input_vector  # Update current_vector with new input
-
 		if input_vector.angle_to(velocity_vector) > (PI/2) || input_vector.angle_to(velocity_vector) < -(PI/2):
 			velocity_vector = velocity_vector.lerp(buildSpeed(input_vector, 1), 0.1)
 		else:

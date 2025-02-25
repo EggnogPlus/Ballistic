@@ -13,4 +13,4 @@ scale = Vector2(21.3281, 12.4062)
 position = Vector2(483, 307)
 
 [node name="Enemy" parent="." instance=ExtResource("2_tg4xs")]
-position = Vector2(827, 318)
+position = Vector2(809, 303)
