@@ -6,7 +6,7 @@
 
 [sub_resource type="SphereMesh" id="SphereMesh_i8l8r"]
 
-[node name="CharacterBody2D" type="CharacterBody2D"]
+[node name="ball" type="CharacterBody2D"]
 position = Vector2(54, 0)
 script = ExtResource("1_oxypw")
 
