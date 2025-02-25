@@ -6,26 +6,29 @@ var BASE_SPEED: float = 100 # Default speed of ball
 var friction: float = 0.05 # Friction of the ball (slows down momentum over time)
 var torque_strength: float = 10 # How strong the rolling torque is
 var max_velocity: float = 4000 # Max velocity the ball can reach
-var multix: float = 0 # Momentum Multiplier*
+var multix: float = 0 # Momentum Multiplier
 # Movement vector
 var velocity_vector: Vector2 = Vector2.ZERO
 
 # Previous Input Vector
 var current_vector = Vector2.ZERO
 
+# Time accumulator for momentum buildup
+var momentum_accumulator: float = 0.0
+var momentum_increase_rate: float = 50.0 # The rate at which momentum increases
+
 func buildSpeed(input_vector, reset):
-	
 	if reset == 1:
-		multix = 0
+		momentum_accumulator = 0.0 # Reset momentum when there's no input
 	else:
-		multix += 1
+		# Increase momentum over time when input is held
+		momentum_accumulator += momentum_increase_rate * get_process_delta_time()
 	
-	return input_vector * (BASE_SPEED + multix)
+	# Increase speed based on momentum
+	var speed = BASE_SPEED + momentum_accumulator
+	return input_vector * speed
 
 func _physics_process(delta):
-	# Get time for debugging
-	var time = Time.get_time_dict_from_system()
-	
 	# Get input for movement
 	var input_vector = Vector2.ZERO
 	
@@ -44,24 +47,12 @@ func _physics_process(delta):
 
 	# If there's input, apply force in that direction
 	if input_vector != Vector2.ZERO:
-		if input_vector != current_vector:
-			# Make new vector the NEW current vector
-			input_vector = current_vector
-			# Reset the gained momentum
-			velocity_vector = velocity_vector.lerp(buildSpeed(input_vector, 1), 0.1)
-			print("new vector")
-		else:
-			velocity_vector = velocity_vector.lerp(buildSpeed(input_vector, 0), 0.1)
-			print("Same vector ###")
-
-	# Apply momentum by maintaining velocity even when no input is given
-	if input_vector == Vector2.ZERO:
-		# Apply friction to slow down the ball naturally
-		velocity_vector = velocity_vector.lerp(Vector2.ZERO, friction)
-
-	# Limit velocity to avoid excessive speed
-	if velocity_vector.length() > max_velocity:
-		velocity_vector = velocity_vector.normalized() * max_velocity
+		current_vector = input_vector  # Update current_vector with new input
+		velocity_vector = velocity_vector.lerp(buildSpeed(input_vector, 0), 0.1)
+	else:
+		#velocity_vector = velocity_vector.lerp(Vector2.ZERO, 0.1)
+		# Apply friction to slow down the ball naturally when there's no input
+		velocity_vector *= (1 - friction)
 
 	# Move the ball using the velocity vector
 	velocity = velocity_vector
