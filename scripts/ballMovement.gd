@@ -1,37 +1,59 @@
 extends CharacterBody2D
 
-# Variables to adjust the movement and rolling behavior
-var MAX_SPEED: float = 700 # Max Speed of the ball
-var BASE_SPEED: float = 100 # Default speed of ball
-var friction: float = 0.05 # Friction of the ball (slows down momentum over time)
-var torque_strength: float = 10 # How strong the rolling torque is
-var max_velocity: float = 4000 # Max velocity the ball can reach
-var multix: float = 0 # Momentum Multiplier
-# Movement vector
-var velocity_vector: Vector2 = Vector2.ZERO
-var speed = 0
+# Movement variables
+var acceleration: float = 600   # How quickly the ball accelerates
+var max_speed: float = 700      # Max normal rolling speed
+var friction: float = 0.02      # Friction to slow down over time
 
+# Momentum & physics
+var velocity_vector: Vector2 = Vector2.ZERO
+var is_grappling: bool = false
+var grapple_point: Vector2 = Vector2.ZERO
+var swing_strength: float = 1000
+var grapple_raycast_node: RayCast2D  # Renamed to avoid conflict
 
 # Time accumulator for momentum buildup
 var momentum_accumulator: float = 0.0
-var momentum_increase_rate: float = 50.0 # The rate at which momentum increases
+var momentum_increase_rate: float = 50.0  # The rate at which momentum increases
 
-## Builds speed depending on the input vector (direction player wants to move) & momentum rate
-## Resets momentum rate if reset = 1 (e.g. in cases where ball reaches slow sleep or player attempts turn around)
-func buildSpeed(input_vector, reset):
-	if reset == 1:
-		momentum_accumulator = 0.0 # Reset momentum when there's no input
-		speed = BASE_SPEED
-	else:
-		# Increase momentum over time when input is held
-		momentum_accumulator += momentum_increase_rate * get_process_delta_time()
-	
-	# Increase speed based on momentum
-	speed = BASE_SPEED + momentum_accumulator
-	return input_vector * speed
+# Grapple-related variables
+var grapple_drawer: Node2D
+
+func _ready():
+	# Access GrappleRaycast node from the root level (Node2D, which is parent of ball)
+	grapple_raycast_node = get_node("/root/Level/Node2D/GrappleRaycast") as RayCast2D
+	if grapple_raycast_node == null:
+		print("Error: GrappleRaycast node not found!")
+	grapple_raycast_node.enabled = false  # Disable the raycast initially
+
+	# Get the GrappleDrawer node from the root
+	grapple_drawer = get_node("/root/Level/Node2D/GrappleDrawer")
+	if grapple_drawer == null:
+		print("Error: GrappleDrawer node not found!")
 
 func _physics_process(delta):
-	# Get input for movement
+	# Handle movement input and grappling logic
+	if Input.is_action_just_pressed("grapple") and not is_grappling:
+		activate_grapple()
+
+	if is_grappling:
+		swing(delta)
+	else:
+		apply_movement(delta)
+
+	# Apply friction when not moving
+	if velocity_vector.length() > 5:
+		velocity_vector *= (1 - friction)
+
+	velocity = velocity_vector
+	move_and_slide()
+
+	# If grappling, redraw the line
+	if is_grappling:
+		queue_redraw()
+
+# 📌 **New Movement System**
+func apply_movement(delta):
 	var input_vector = Vector2.ZERO
 	
 	if Input.is_action_pressed("ui_left"):
@@ -44,26 +66,65 @@ func _physics_process(delta):
 	elif Input.is_action_pressed("ui_down"):
 		input_vector.y = 1
 	
-	# Normalize the direction to prevent diagonal speed boost
 	input_vector = input_vector.normalized()
 
-	# If there's input, apply force in that direction
 	if input_vector != Vector2.ZERO:
-		if input_vector.angle_to(velocity_vector) > (PI/2) || input_vector.angle_to(velocity_vector) < -(PI/2):
-			velocity_vector = velocity_vector.lerp(buildSpeed(input_vector, 1), 0.1)
-		else:
-			velocity_vector = velocity_vector.lerp(buildSpeed(input_vector, 0), 0.1)
-	# Checks if moving slower than 50 units in all directions to reset momentum
-	elif (velocity_vector.x < 50 && velocity_vector.x > -50) && (velocity_vector.y < 50 && velocity_vector.y > -50) :
-		buildSpeed(input_vector, 1)
-		velocity_vector *= (1 - friction)
-	else:
-		#velocity_vector = velocity_vector.lerp(Vector2.ZERO, 0.1)
-		# Apply friction to slow down the ball naturally when there's no input
-		velocity_vector *= (1 - friction)
+		# Accelerate in the input direction while preserving momentum
+		velocity_vector += input_vector * acceleration * delta
+		# Cap speed
+		if velocity_vector.length() > max_speed:
+			velocity_vector = velocity_vector.normalized() * max_speed
 
-	# Move the ball using the velocity vector
-	velocity = velocity_vector
+# 📌 **New Grapple System**
+func activate_grapple():
+	var nearest_grapple = find_nearest_grapple_point()
+	if nearest_grapple:
+		grapple_point = nearest_grapple.position
+		is_grappling = true
+		
+	if grapple_raycast_node.is_colliding():
+		var collider = grapple_raycast_node.get_collider()
+		if collider is StaticBody2D and collider.is_in_group("grapple_point"):
+			grapple_point = grapple_raycast_node.get_collision_point()
+			is_grappling = true
 
-	# Call move_and_slide to move the character using velocity
-	move_and_slide()
+			# Notify GrappleDrawer that we are grappling
+			grapple_drawer.is_grappling = true
+			grapple_drawer.grapple_point = grapple_point
+
+func swing(delta):
+	var direction_to_grapple = (grapple_point - position).normalized()
+	var tangent_direction = Vector2(-direction_to_grapple.y, direction_to_grapple.x)  # Perpendicular vector
+
+	# Maintain momentum tangentially instead of pulling toward the point
+	var swing_force = tangent_direction * swing_strength
+	velocity_vector += swing_force * delta
+
+	# Release grapple with correct exit momentum
+	if Input.is_action_just_pressed("release_grapple"):
+		release_grapple()
+
+func release_grapple():
+	is_grappling = false
+	grapple_raycast_node.enabled = false
+  
+
+# 📌 **Finds Closest Grapple Point**
+func find_nearest_grapple_point():
+	var nearest = null
+	var min_distance = 200
+	
+	for grapple in get_tree().get_nodes_in_group("grapple_point"):
+		if grapple is StaticBody2D:
+			var dist = position.distance_to(grapple.position)
+			if dist < min_distance:
+				min_distance = dist
+				nearest = grapple
+	
+	return nearest
+
+# 📌 **Drawing the Grapple Line**
+func _draw():
+	if is_grappling:
+		# Draw the line between the ball and the grapple point
+		draw_line(Vector2.ZERO, to_local(grapple_point), Color.BLACK, 2.0)

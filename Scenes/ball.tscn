@@ -1,18 +1,27 @@
-[gd_scene load_steps=4 format=3 uid="uid://braj8e5h444ub"]
+[gd_scene load_steps=5 format=3 uid="uid://braj8e5h444ub"]
 
 [ext_resource type="Script" path="res://scripts/ballMovement.gd" id="1_oxypw"]
+[ext_resource type="Script" path="res://scripts/grapple_drawer.gd" id="2_cvqjm"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_afshr"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_i8l8r"]
 
-[node name="ball" type="CharacterBody2D"]
-position = Vector2(54, 0)
+[node name="Node2D" type="Node2D"]
+
+[node name="ball" type="CharacterBody2D" parent="."]
 script = ExtResource("1_oxypw")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ball"]
 shape = SubResource("CircleShape2D_afshr")
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+[node name="MeshInstance2D" type="MeshInstance2D" parent="ball"]
 scale = Vector2(19.7955, 19.7239)
 mesh = SubResource("SphereMesh_i8l8r")
+
+[node name="GrappleLine" type="Line2D" parent="ball"]
+
+[node name="GrappleRaycast" type="RayCast2D" parent="."]
+
+[node name="GrappleDrawer" type="Node2D" parent="."]
+script = ExtResource("2_cvqjm")
