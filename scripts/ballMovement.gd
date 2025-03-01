@@ -20,6 +20,10 @@ var momentum_increase_rate: float = 50.0  # The rate at which momentum increases
 var grapple_drawer: Node2D
 
 func _ready():
+	
+	# b a l l
+	#ball = get_node("ball") as CharacterBody2D
+	
 	# Access GrappleRaycast node from the root level (Node2D, which is parent of ball)
 	grapple_raycast_node = get_node("/root/Level/Node2D/GrappleRaycast") as RayCast2D
 	if grapple_raycast_node == null:
@@ -81,16 +85,13 @@ func activate_grapple():
 	if nearest_grapple:
 		grapple_point = nearest_grapple.position
 		is_grappling = true
-		
-	if grapple_raycast_node.is_colliding():
-		var collider = grapple_raycast_node.get_collider()
-		if collider is StaticBody2D and collider.is_in_group("grapple_point"):
-			grapple_point = grapple_raycast_node.get_collision_point()
-			is_grappling = true
 
-			# Notify GrappleDrawer that we are grappling
-			grapple_drawer.is_grappling = true
-			grapple_drawer.grapple_point = grapple_point
+		# Notify GrappleDrawer that we are grappling
+		grapple_drawer.is_grappling = true
+		grapple_drawer.grapple_point = grapple_point
+	else:
+		print("No grapple point in range!\n")
+
 
 func swing(delta):
 	var direction_to_grapple = (grapple_point - position).normalized()
@@ -112,16 +113,24 @@ func release_grapple():
 # 📌 **Finds Closest Grapple Point**
 func find_nearest_grapple_point():
 	var nearest = null
-	var min_distance = 200
+	var min_distance = 200  # Maximum grapple range
+	var closest_distance = min_distance  # Store the closest valid point within range
 	
 	for grapple in get_tree().get_nodes_in_group("grapple_point"):
 		if grapple is StaticBody2D:
-			var dist = position.distance_to(grapple.position)
-			if dist < min_distance:
-				min_distance = dist
+			var dist = ball.global_position.distance_to(grapple.global_position)
+
+			print(grapple)
+			print(dist)
+			print("---")
+			
+			# Only consider grapple points that are within range
+			if dist <= min_distance and (nearest == null or dist < closest_distance):
+				closest_distance = dist
 				nearest = grapple
 	
-	return nearest
+	return nearest  # Returns the closest in-range grapple or null if none
+
 
 # 📌 **Drawing the Grapple Line**
 func _draw():
