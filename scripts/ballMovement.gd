@@ -130,9 +130,6 @@ func swing(delta):
 		release_grapple()
 
 
-
-
-
 func release_grapple():
 	is_grappling = false
 	grapple_raycast_node.enabled = false
