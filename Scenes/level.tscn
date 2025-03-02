@@ -20,3 +20,7 @@ position = Vector2(721, 290)
 
 [node name="Node2D" parent="." instance=ExtResource("1_rrr6d")]
 position = Vector2(475, 308)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(574, 320)
+zoom = Vector2(0.1, 0.1)
