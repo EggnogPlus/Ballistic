@@ -19,11 +19,7 @@ var momentum_increase_rate: float = 50.0  # The rate at which momentum increases
 # Grapple-related variables
 var grapple_drawer: Node2D
 
-func _ready():
-	
-	# b a l l
-	#ball = get_node("ball") as CharacterBody2D
-	
+func _ready():	
 	# Access GrappleRaycast node from the root level (Node2D, which is parent of ball)
 	grapple_raycast_node = get_node("/root/Level/Node2D/GrappleRaycast") as RayCast2D
 	if grapple_raycast_node == null:
@@ -42,6 +38,7 @@ func _physics_process(delta):
 
 	if is_grappling:
 		swing(delta)
+		# draw grapple here?
 	else:
 		apply_movement(delta)
 
@@ -155,10 +152,3 @@ func find_nearest_grapple_point():
 				nearest = grapple
 	
 	return nearest  # Returns the closest in-range grapple or null if none
-
-
-# 📌 **Drawing the Grapple Line**
-func _draw():
-	if is_grappling:
-		# Draw the line between the ball and the grapple point
-		draw_line(Vector2.ZERO, to_local(grapple_point), Color.BLACK, 2.0)

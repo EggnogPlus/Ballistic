@@ -20,3 +20,4 @@ func release_grapple():
 	# When releasing the grapple, stop drawing the line
 	is_grappling = false
 	grapple_raycast_node.enabled = false
+	
