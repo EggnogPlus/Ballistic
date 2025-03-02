@@ -89,7 +89,7 @@ func activate_grapple():
 		is_grappling = true
 
 		# Store initial distance for max grapple length
-		grapple_max_distance = self.position.distance_to(grapple_point)
+		grapple_max_distance = self.global_position.distance_to(grapple_point)
 
 		# Notify GrappleDrawer that we are grappling
 		grapple_drawer.is_grappling = true
@@ -101,33 +101,33 @@ func activate_grapple():
 
 
 func swing(delta):
-	var direction_to_grapple = (self.grapple_point - self.position).normalized()
-	var current_distance = self.position.distance_to(self.grapple_point)
-	print("Current D: ", current_distance)
-	print("Current Dir to grapple: ", direction_to_grapple)
-	print("---")
+	var direction_to_grapple = (self.grapple_point - self.global_position).normalized()
+	var current_distance = self.global_position.distance_to(self.grapple_point)
 	
-	# Maintain initial grapple distance (MAX range)
+	# Maintain the correct grapple distance (don't push ball to initial position)
 	if current_distance > self.grapple_max_distance:
-		print("PAST MAX RANGE")
-		var correction_vector = (self.position - self.grapple_point).normalized() * (current_distance - self.grapple_max_distance)
-		self.position -= correction_vector  # Directly adjust position to enforce constraint
-		self.velocity_vector -= correction_vector / delta  # Adjust velocity to match
+		# Ensure the ball stays within the max range without resetting to the initial position
+		var correction_vector = (self.global_position - self.grapple_point).normalized() * (current_distance - self.grapple_max_distance)
+		self.global_position -= correction_vector  # Adjust ball position to stay within max range
+		self.velocity_vector -= correction_vector / delta  # Adjust velocity accordingly
+		print("MAX DISTANCE")
+		print(current_distance, " ", grapple_max_distance)
 
-	# Compute perpendicular (tangential) directions
+	# Calculate perpendicular (tangential) directions for swinging
 	var tangent_dir_1 = Vector2(-direction_to_grapple.y, direction_to_grapple.x)  # Counterclockwise
 	var tangent_dir_2 = Vector2(direction_to_grapple.y, -direction_to_grapple.x)  # Clockwise
 
-	# Pick the tangent that aligns best with current velocity
+	# Choose the tangent direction that aligns with the ball's current velocity
 	var tangent_direction = tangent_dir_1 if self.velocity_vector.dot(tangent_dir_1) > self.velocity_vector.dot(tangent_dir_2) else tangent_dir_2
 
-	# Apply swing force tangentially (to keep circular motion)
+	# Apply swing force based on tangential direction
 	var swing_force = tangent_direction * self.swing_strength * delta
 	self.velocity_vector += swing_force
 
 	# Release grapple when needed
 	if Input.is_action_just_pressed("release_grapple"):
 		release_grapple()
+
 
 
 func release_grapple():
