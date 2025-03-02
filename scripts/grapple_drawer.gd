@@ -11,13 +11,21 @@ func _ready():
 	grapple_raycast_node = get_node("/root/Level/Node2D/GrappleRaycast")  # GrappleRaycast
 	grapple_raycast_node.enabled = false  # Initially, the grapple raycast is disabled
 
+	# Ensure the GrappleDrawer is visible
+	self.visible = true  # Make sure the node is visible
+
 func _draw():
 	# Only draw the grapple line if we're grappling
 	if is_grappling:
-		draw_line(Vector2.ZERO, to_local(grapple_point), Color.BLACK, 2.0)  # Draw the line
+		# Convert both the ball and grapple_point positions to the local coordinates of this Node2D
+		var local_ball_position = to_local(ball.global_position)
+		var local_grapple_point = to_local(grapple_point)
+
+		# Draw the line from the ball to the grapple point in local coordinates
+		draw_line(local_ball_position, local_grapple_point, Color.BLACK, 2.0)  # Draw the line
 
 func release_grapple():
 	# When releasing the grapple, stop drawing the line
 	is_grappling = false
 	grapple_raycast_node.enabled = false
-	
+	queue_redraw()  # Request a redraw after releasing the grapple

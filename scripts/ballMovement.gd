@@ -11,15 +11,13 @@ var is_grappling: bool = false
 var grapple_point: Vector2 = Vector2.ZERO
 var swing_strength: float = 1000
 var grapple_raycast_node: RayCast2D  # Renamed to avoid conflict
+var grapple_drawer: Node2D  # Reference to the GrappleDrawer node
 
 # Time accumulator for momentum buildup
 var momentum_accumulator: float = 0.0
 var momentum_increase_rate: float = 50.0  # The rate at which momentum increases
 
-# Grapple-related variables
-var grapple_drawer: Node2D
-
-func _ready():	
+func _ready():
 	# Access GrappleRaycast node from the root level (Node2D, which is parent of ball)
 	grapple_raycast_node = get_node("/root/Level/Node2D/GrappleRaycast") as RayCast2D
 	if grapple_raycast_node == null:
@@ -38,7 +36,8 @@ func _physics_process(delta):
 
 	if is_grappling:
 		swing(delta)
-		# draw grapple here?
+		# Draw Grapple 
+		grapple_drawer.queue_redraw()
 	else:
 		apply_movement(delta)
 
@@ -53,7 +52,7 @@ func _physics_process(delta):
 	if is_grappling:
 		queue_redraw()
 
-# 📌 **New Movement System**
+## Movement system when not grappling
 func apply_movement(delta):
 	var input_vector = Vector2.ZERO
 	
@@ -76,9 +75,9 @@ func apply_movement(delta):
 		if velocity_vector.length() > max_speed:
 			velocity_vector = velocity_vector.normalized() * max_speed
 
-# 📌 **New Grapple System**
 var grapple_max_distance: float = 0.0  # Stores max allowed distance
 
+## Find nearest grapple, if successful activate grappling
 func activate_grapple():
 	var nearest_grapple = find_nearest_grapple_point()
 	if nearest_grapple:
@@ -94,9 +93,7 @@ func activate_grapple():
 	else:
 		print("No grapple point in range!\n")
 
-
-
-
+## Movement system while grappling
 func swing(delta):
 	var direction_to_grapple = (self.grapple_point - self.global_position).normalized()
 	var current_distance = self.global_position.distance_to(self.grapple_point)
@@ -107,8 +104,6 @@ func swing(delta):
 		var correction_vector = (self.global_position - self.grapple_point).normalized() * (current_distance - self.grapple_max_distance)
 		self.global_position -= correction_vector  # Adjust ball position to stay within max range
 		self.velocity_vector -= correction_vector / delta  # Adjust velocity accordingly
-		print("MAX DISTANCE")
-		print(current_distance, " ", grapple_max_distance)
 
 	# Calculate perpendicular (tangential) directions for swinging
 	var tangent_dir_1 = Vector2(-direction_to_grapple.y, direction_to_grapple.x)  # Counterclockwise
@@ -125,14 +120,13 @@ func swing(delta):
 	if Input.is_action_just_pressed("release_grapple"):
 		release_grapple()
 
-
-
 func release_grapple():
 	is_grappling = false
 	grapple_raycast_node.enabled = false
-  
+	# Call the GrappleDrawer's release_grapple function to stop drawing the line
+	grapple_drawer.release_grapple()
 
-# 📌 **Finds Closest Grapple Point**
+
 func find_nearest_grapple_point():
 	var nearest = null
 	var min_distance = 200  # Maximum grapple range
