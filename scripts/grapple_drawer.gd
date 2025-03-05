@@ -22,7 +22,7 @@ func _draw():
 		var local_grapple_point = to_local(grapple_point)
 
 		# Draw the line from the ball to the grapple point in local coordinates
-		draw_line(local_ball_position, local_grapple_point, Color.BLACK, 2.0)  # Draw the line
+		draw_line(local_ball_position, local_grapple_point, Color.GRAY, 4.0)  # Draw the line
 
 func release_grapple():
 	# When releasing the grapple, stop drawing the line
