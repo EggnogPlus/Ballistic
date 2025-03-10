@@ -4,14 +4,14 @@
 [ext_resource type="Script" path="res://scripts/scriptResize.gd" id="2_fmfrp"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hh4po"]
+size = Vector2(1920, 1080)
 
 [node name="Wall" type="Node2D"]
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 
 [node name="Sprite2D" type="Sprite2D" parent="StaticBody2D"]
-position = Vector2(-1.90735e-06, 1.90735e-06)
-scale = Vector2(0.188443, 0.333857)
+position = Vector2(2.27374e-13, 0)
 texture = ExtResource("1_8di0t")
 script = ExtResource("2_fmfrp")
 
