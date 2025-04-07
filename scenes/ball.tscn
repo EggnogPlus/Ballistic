@@ -7,7 +7,7 @@
 
 [sub_resource type="SphereMesh" id="SphereMesh_i8l8r"]
 
-[node name="Node2D" type="Node2D"]
+[node name="Player" type="Node2D"]
 
 [node name="ball" type="CharacterBody2D" parent="."]
 script = ExtResource("1_oxypw")
@@ -22,6 +22,7 @@ mesh = SubResource("SphereMesh_i8l8r")
 [node name="GrappleLine" type="Line2D" parent="ball"]
 
 [node name="GrappleRaycast" type="RayCast2D" parent="."]
+unique_name_in_owner = true
 
 [node name="GrappleDrawer" type="Node2D" parent="."]
 script = ExtResource("2_cvqjm")

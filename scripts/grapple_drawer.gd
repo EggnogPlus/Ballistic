@@ -7,8 +7,8 @@ var grapple_raycast_node: RayCast2D
 
 func _ready():
 	# Access Ball and GrappleRaycast from the root level (Node2D)
-	ball = get_node("/root/Level/Node2D/ball")  # Ball is a child of Node2D
-	grapple_raycast_node = get_node("/root/Level/Node2D/GrappleRaycast")  # GrappleRaycast
+	ball = get_node("/root/Level/Player/ball")  # Ball is a child of Node2D
+	grapple_raycast_node = get_node("/root/Level/Player/GrappleRaycast")  # GrappleRaycast
 	grapple_raycast_node.enabled = false  # Initially, the grapple raycast is disabled
 
 	# Ensure the GrappleDrawer is visible

@@ -19,13 +19,13 @@ var momentum_increase_rate: float = 50.0  # The rate at which momentum increases
 
 func _ready():
 	# Access GrappleRaycast node from the root level (Node2D, which is parent of ball)
-	grapple_raycast_node = get_node("/root/Level/Node2D/GrappleRaycast") as RayCast2D
+	grapple_raycast_node = get_node("/root/Level/Player/GrappleRaycast") as RayCast2D
 	if grapple_raycast_node == null:
 		print("Error: GrappleRaycast node not found!")
 	grapple_raycast_node.enabled = false  # Disable the raycast initially
 
 	# Get the GrappleDrawer node from the root
-	grapple_drawer = get_node("/root/Level/Node2D/GrappleDrawer")
+	grapple_drawer = get_node("/root/Level/Player/GrappleDrawer")
 	if grapple_drawer == null:
 		print("Error: GrappleDrawer node not found!")
 
