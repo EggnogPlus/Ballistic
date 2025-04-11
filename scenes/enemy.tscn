@@ -6,6 +6,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s4oyf"]
 
 [node name="CharacterBody2D" type="CharacterBody2D"]
+scale = Vector2(3.5, 3.5)
 script = ExtResource("1_7vkuo")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -14,3 +15,16 @@ texture = ExtResource("2_65ego")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_s4oyf")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Area2D"]
+polygon = PackedVector2Array(-50, 100, 50, 100, 0, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Area2D/CollisionPolygon2D"]
+position = Vector2(-0.57143, 57.4286)
+scale = Vector2(0.419643, 0.549107)
+texture = ExtResource("2_65ego")
+
+[node name="frontMarker" type="Marker2D" parent="Area2D"]
+position = Vector2(0, 100)
