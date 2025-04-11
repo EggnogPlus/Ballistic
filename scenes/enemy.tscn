@@ -6,19 +6,24 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s4oyf"]
 
 [node name="CharacterBody2D" type="CharacterBody2D"]
+rotation = 1.5708
 scale = Vector2(3.5, 3.5)
 script = ExtResource("1_7vkuo")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+rotation = 3.14159
 scale = Vector2(0.15625, 0.15625)
 texture = ExtResource("2_65ego")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = 1.5708
 shape = SubResource("RectangleShape2D_s4oyf")
 
 [node name="Area2D" type="Area2D" parent="."]
+rotation = 1.5708
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Area2D"]
+rotation = 1.5708
 polygon = PackedVector2Array(-50, 100, 50, 100, 0, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="Area2D/CollisionPolygon2D"]
@@ -28,3 +33,4 @@ texture = ExtResource("2_65ego")
 
 [node name="frontMarker" type="Marker2D" parent="Area2D"]
 position = Vector2(0, 100)
+rotation = 1.5708
