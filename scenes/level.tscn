@@ -34,6 +34,7 @@ spawn_points = [NodePath("SpawnPoint1"), NodePath("SpawnPoint2")]
 spawn_interval = 5.0
 
 [node name="SpawnPoint1" type="Marker2D" parent="EnemySpawner"]
+position = Vector2(50, 300)
 
 [node name="SpawnPoint2" type="Marker2D" parent="EnemySpawner"]
 position = Vector2(1000, 300)
