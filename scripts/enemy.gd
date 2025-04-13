@@ -64,7 +64,7 @@ func _on_body_exited(body):
 #region state movements
 
 func patrolMovement(delta):
-	patrolTime += 1.0 / Engine.get_frames_per_second()
+	patrolTime += delta
 
 	if patrolTime >= maxPatrolTime or target_direction == Vector2.ZERO:
 		patrolTime = 0.0
@@ -84,8 +84,19 @@ func patrolMovement(delta):
 
 func losingMovement(delta):
 	# Move Toward Where player was last seen
-	var to_last_seen_player = lastKnownLocation - global_position
-	rotation = to_last_seen_player.angle() + PI / 2 
+	navigationAgent.target_position = lastKnownLocation
+	
+	# Move toward the next point along the path
+	var next_position = navigationAgent.get_next_path_position()
+
+	#var next_position = navigationAgent.get_next_path_position()
+	var to_next = global_position.direction_to(next_position)
+	
+	# Smoothly rotate toward the next path point
+	var desired_angle = to_next.angle() + PI / 2
+	rotation = desired_angle
+
+	# Apply movement using rotation-based direction (if you want the old "Vector2.UP" style)
 	velocity = Vector2.UP.rotated(rotation) * huntSpeed
 	
 	# Wait mustHaveBeenTheWind time before returning to patrol state
@@ -173,17 +184,18 @@ func _physics_process(delta):
 	if player and is_instance_valid(player):
 		stateActions(delta)
 		
-		
-func _draw():
-	if navigationAgent and not navigationAgent.is_navigation_finished():
-		var path = navigationAgent.get_current_navigation_path()
-		
-		for i in range(path.size()):
-			# Convert world path point to local rotated space
-			var local_point = (path[i] - global_position).rotated(-rotation)
-			
-			draw_circle(local_point, 4, Color.GREEN)
-			
-			if i < path.size() - 1:
-				var next_local_point = (path[i + 1] - global_position).rotated(-rotation)
-				draw_line(local_point, next_local_point, Color.GREEN, 2)
+
+## Draws Enemy Pathing --FYI drawn line does not dissapear
+#func _draw():
+	#if navigationAgent and not navigationAgent.is_navigation_finished():
+		#var path = navigationAgent.get_current_navigation_path()
+		#
+		#for i in range(path.size()):
+			## Convert world path point to local rotated space
+			#var local_point = (path[i] - global_position).rotated(-rotation)
+			#
+			#draw_circle(local_point, 4, Color.GREEN)
+			#
+			#if i < path.size() - 1:
+				#var next_local_point = (path[i + 1] - global_position).rotated(-rotation)
+				#draw_line(local_point, next_local_point, Color.GREEN, 2)

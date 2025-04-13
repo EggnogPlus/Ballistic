@@ -36,6 +36,4 @@ position = Vector2(0, 100)
 rotation = 1.5708
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 4.0
-target_desired_distance = 5.0
-radius = 2.0
+path_desired_distance = 2.0

@@ -129,7 +129,7 @@ func release_grapple():
 
 func find_nearest_grapple_point():
 	var nearest = null
-	var min_distance = 200  # Maximum grapple range
+	var min_distance = 250  # Maximum grapple range
 	var closest_distance = min_distance  # Store the closest valid point within range
 	
 	for grapple in get_tree().get_nodes_in_group("grapple_point"):
