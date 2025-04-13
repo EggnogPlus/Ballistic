@@ -5,7 +5,12 @@ var huntSpeed: float = 150.0
 var turnSpeed = 2.0
 enum ENEMY_STATE {PATROLLING, # 0
 					 LOSING, # 1
-					 HUNTING} # 2
+					 HUNTING, # 2
+					 BLIND_HUNT} # 3
+# Blind
+var blindHuntTimer = 0
+var blindHuntLimit = 4
+
 # Patrolling variables
 var lastKnownLocation: Vector2
 var mustHaveBeenTheWind = 3.0
@@ -22,6 +27,8 @@ var target_direction: Vector2
 @onready var frontMarker = $Area2D/frontMarker
 @onready var visionCone = $Area2D
 @onready var player = get_node_or_null("/root/Level/Player/ball")
+@onready var navigationAgent: NavigationAgent2D = $NavigationAgent2D
+
 #endregion
 
 #region Get Direction w/ get_facing_direction, and hooks for entering / exiting vision code 
@@ -30,10 +37,17 @@ func get_facing_direction() -> Vector2:
 	directionFacing = frontMarker.global_position - self.global_position
 	return directionFacing
 	
-## Runs once and hooks up player entering and exiting enemy visionCone
+## Runs once and hooks up player entering and exiting enemy visionCone plus wait for physics frame
 func _ready():
 	visionCone.connect("body_entered", Callable(self, "_on_body_entered"))
 	visionCone.connect("body_exited", Callable(self, "_on_body_exited"))
+	set_physics_process(false)
+	call_deferred("waitForPhysics")
+	
+## Wait for physics frame and then set physics process back to true
+func waitForPhysics():
+	await get_tree().physics_frame
+	set_physics_process(true)
 
 ## function for when player ENTERS vision cone
 func _on_body_entered(body):
@@ -43,8 +57,9 @@ func _on_body_entered(body):
 ## function for when player EXITS vision cone
 func _on_body_exited(body):
 	if body.name == "ball":
-		currentState = ENEMY_STATE.LOSING # 1
+		currentState = ENEMY_STATE.BLIND_HUNT # 3
 #endregion
+	
 
 #region state movements
 
@@ -89,17 +104,50 @@ func losingMovement(delta):
 func huntingMovement(delta):
 	if not player:
 		return
-	
-	var to_player = player.global_position - global_position
-	# Continually update lastKnownLocation for when enemy loses sight
-	lastKnownLocation = player.global_position
-	rotation = to_player.angle() + PI / 2 
 
-	# Vector2.UP is (0, -1) → pointing up.
-	# .rotated(rotation) turns it to match the direction the enemy is facing. as rotation = self.~objs cur angle 
+	# Update target destination
+	navigationAgent.target_position = player.global_position
+	
+	# Continually update last locaiton
+	lastKnownLocation = player.global_position
+	
+	# Move toward the next point along the path
+	var next_position = 0
+	if not navigationAgent.is_navigation_finished():
+		next_position = navigationAgent.get_next_path_position()
+
+	#var next_position = navigationAgent.get_next_path_position()
+	var to_next = global_position.direction_to(next_position)
+	
+	# Smoothly rotate toward the next path point
+	var desired_angle = to_next.angle() + PI / 2
+	rotation = desired_angle
+
+	# Apply movement using rotation-based direction (if you want the old "Vector2.UP" style)
 	velocity = Vector2.UP.rotated(rotation) * huntSpeed
+	
+	#region old hunting movement code
+	#var to_player = player.global_position - global_position
+	## Continually update lastKnownLocation for when enemy loses sight
+	#lastKnownLocation = player.global_position
+	#rotation = to_player.angle() + PI / 2 
+#
+	## Vector2.UP is (0, -1) → pointing up.
+	## .rotated(rotation) turns it to match the direction the enemy is facing. as rotation = self.~objs cur angle 
+	#velocity = Vector2.UP.rotated(rotation) * huntSpeed
+	#endregion
 
 	move_and_slide()
+
+func blindMovement(delta):
+	blindHuntTimer += delta
+	if (blindHuntTimer >= blindHuntLimit):
+		# Lost Player
+		currentState = ENEMY_STATE.LOSING
+		blindHuntTimer = 0
+	else:
+		# Keep Hunting
+		huntingMovement(delta)
 
 #endregion
 
@@ -115,9 +163,27 @@ func stateActions(delta):
 		2: # HUNTING
 			sprite.modulate = Color(1, 0, 0)
 			huntingMovement(delta)
+		3: # BLIND_HUNT
+			sprite.modulate = Color(0, 1, 0)
+			blindMovement(delta)
 
 ## Function constally run for enemy
 func _physics_process(delta):
+	queue_redraw()
 	if player and is_instance_valid(player):
 		stateActions(delta)
 		
+		
+func _draw():
+	if navigationAgent and not navigationAgent.is_navigation_finished():
+		var path = navigationAgent.get_current_navigation_path()
+		
+		for i in range(path.size()):
+			# Convert world path point to local rotated space
+			var local_point = (path[i] - global_position).rotated(-rotation)
+			
+			draw_circle(local_point, 4, Color.GREEN)
+			
+			if i < path.size() - 1:
+				var next_local_point = (path[i + 1] - global_position).rotated(-rotation)
+				draw_line(local_point, next_local_point, Color.GREEN, 2)
