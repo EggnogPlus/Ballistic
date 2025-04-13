@@ -2,16 +2,15 @@ extends CharacterBody2D
 
 var acceleration: float = 200
 var max_roll_speed: float = 400
-var friction: float = 0.02
+var friction: float = 0.01
 
 @onready var mesh_instance_2d: MeshInstance2D = $MeshInstance2D
 
 var is_grappling: bool = false
 var grapple_point: Vector2 = Vector2.ZERO
-var swing_strength: float = 1000
+var swing_strength: float = 600
 var grapple_raycast_node: RayCast2D
 var grapple_drawer: Node2D
-
 var grapple_max_distance: float = 0.0
 
 func _ready():
@@ -34,9 +33,9 @@ func _physics_process(delta):
 	else:
 		apply_movement(delta)
 
-	if not is_grappling and Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down") == Vector2.ZERO:
+	if not is_grappling:
 		if velocity.length() > 5:
-			velocity *= (1 - friction * delta * 60)
+			velocity *= (1 - friction * delta * 30)
 
 	if velocity.length() > max_roll_speed:
 		mesh_instance_2d.modulate = Color(1, 0, 0)
@@ -83,10 +82,15 @@ func apply_movement(delta):
 		if (velocity + input_force).length() < max_roll_speed:
 			velocity += input_force
 		else:
+			#if not in_grapple_momentum:
 			# Momentum steering — influence without cancelling velocity
-			var alignment = velocity.normalized().dot(input_vector)
-			var steering_influence = clamp((alignment + 1.0) / 2.0, 0.25, 0.75)
-			velocity = velocity * steering_influence
+			print("3:")
+			var velocity_direction = velocity.normalized()
+			var parallel_component = input_vector.dot(velocity_direction) * velocity_direction
+			var perpendicular_component = input_vector - parallel_component
+			velocity += perpendicular_component  # Adjust delta for appropriate steering strength
+				
+				
 
 func activate_grapple():
 	var nearest_grapple = find_nearest_grapple_point()
