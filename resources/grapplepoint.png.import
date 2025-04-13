@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://0ipt43pqo2l8"
-path="res://.godot/imported/sheet.png-ce33e4afb39ca366e88c8d3b825c7266.ctex"
+uid="uid://b0oy2o1in8qap"
+path="res://.godot/imported/grapplepoint.png-2e6e28018c18bc5a6eb0a49d49f36733.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/sheet.png"
-dest_files=["res://.godot/imported/sheet.png-ce33e4afb39ca366e88c8d3b825c7266.ctex"]
+source_file="res://resources/grapplepoint.png"
+dest_files=["res://.godot/imported/grapplepoint.png-2e6e28018c18bc5a6eb0a49d49f36733.ctex"]
 
 [params]
 
