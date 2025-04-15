@@ -5,7 +5,7 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s4oyf"]
 
-[node name="CharacterBody2D" type="CharacterBody2D"]
+[node name="CharacterBody2D" type="CharacterBody2D" groups=["enemies"]]
 rotation = 1.5708
 scale = Vector2(3.5, 3.5)
 script = ExtResource("1_7vkuo")
@@ -36,4 +36,3 @@ position = Vector2(0, 100)
 rotation = 1.5708
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 2.0

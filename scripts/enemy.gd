@@ -59,28 +59,54 @@ func _on_body_exited(body):
 	if body.name == "ball":
 		currentState = ENEMY_STATE.BLIND_HUNT # 3
 #endregion
+
+func set_new_patrol_target():
+	var max_distance := 3000
+	var random_offset = Vector2.RIGHT.rotated(randf_range(0, TAU)) * randf_range(300, max_distance)
+	var target = global_position + random_offset
+
+	# Avoid other enemies
+	var enemies = get_tree().get_nodes_in_group("enemies")  # Assuming all enemies are in the "enemies" group
+	for enemy in enemies:
+		if enemy != self and global_position.distance_to(enemy.global_position) < 100:  # 100 is the avoidance distance
+			target = global_position + (target - global_position).normalized() * 150  # Move target away from the enemy
 	
+	var nav_map = navigationAgent.get_navigation_map()
+	var safe_point = NavigationServer2D.map_get_closest_point(nav_map, target)
+
+	navigationAgent.target_position = safe_point
+
+
+
 
 #region state movements
 
 func patrolMovement(delta):
-	patrolTime += delta
+	if navigationAgent.is_navigation_finished():
+		set_new_patrol_target()
 
-	if patrolTime >= maxPatrolTime or target_direction == Vector2.ZERO:
-		patrolTime = 0.0
-		maxPatrolTime = randf_range(1.5, 3.0)
-		
-		# Generate a random unit vector (direction)
-		var rand_angle = randf_range(0, TAU)
-		target_direction = Vector2.RIGHT.rotated(rand_angle).normalized()
+	var path = navigationAgent.get_current_navigation_path() # full path
+	var next_position = navigationAgent.get_next_path_position()
+	var to_next = global_position.direction_to(next_position)
+	
+	# Avoid spinning if we're too close to the point
+	if global_position.distance_to(next_position) < 5:
+		set_new_patrol_target()
+		return
+	# Avoid spinning if next dot is too close
+	if path.size() > 1:
+		var next_next_position = path[1]  # index 1 is the "next next" position
+		# If super close to next position - skip it - avoid spinning
+		if global_position.distance_to(to_next) < 15:
+			to_next = global_position.direction_to(next_next_position)
 
-	# Smoothly rotate toward the direction
-	var target_angle = target_direction.angle() + PI / 2
+	var target_angle = to_next.angle() + PI / 2
 	rotation = lerp_angle(rotation, target_angle, turnSpeed * delta)
 
-	# 🚨 Move in the direction you chose (not based on UP anymore)
-	velocity = target_direction * speed
+	velocity = Vector2.UP.rotated(rotation) * speed
 	move_and_slide()
+
+
 
 func losingMovement(delta):
 	# Move Toward Where player was last seen
@@ -122,10 +148,11 @@ func huntingMovement(delta):
 	# Continually update last locaiton
 	lastKnownLocation = player.global_position
 	
+	if navigationAgent.is_navigation_finished():
+		return
+	
 	# Move toward the next point along the path
-	var next_position = 0
-	if not navigationAgent.is_navigation_finished():
-		next_position = navigationAgent.get_next_path_position()
+	var next_position = navigationAgent.get_next_path_position()
 
 	#var next_position = navigationAgent.get_next_path_position()
 	var to_next = global_position.direction_to(next_position)
@@ -137,17 +164,6 @@ func huntingMovement(delta):
 	# Apply movement using rotation-based direction (if you want the old "Vector2.UP" style)
 	velocity = Vector2.UP.rotated(rotation) * huntSpeed
 	
-	#region old hunting movement code
-	#var to_player = player.global_position - global_position
-	## Continually update lastKnownLocation for when enemy loses sight
-	#lastKnownLocation = player.global_position
-	#rotation = to_player.angle() + PI / 2 
-#
-	## Vector2.UP is (0, -1) → pointing up.
-	## .rotated(rotation) turns it to match the direction the enemy is facing. as rotation = self.~objs cur angle 
-	#velocity = Vector2.UP.rotated(rotation) * huntSpeed
-	#endregion
-
 	move_and_slide()
 
 func blindMovement(delta):
@@ -186,16 +202,15 @@ func _physics_process(delta):
 		
 
 ## Draws Enemy Pathing --FYI drawn line does not dissapear
-#func _draw():
-	#if navigationAgent and not navigationAgent.is_navigation_finished():
-		#var path = navigationAgent.get_current_navigation_path()
-		#
-		#for i in range(path.size()):
-			## Convert world path point to local rotated space
-			#var local_point = (path[i] - global_position).rotated(-rotation)
-			#
-			#draw_circle(local_point, 4, Color.GREEN)
-			#
-			#if i < path.size() - 1:
-				#var next_local_point = (path[i + 1] - global_position).rotated(-rotation)
-				#draw_line(local_point, next_local_point, Color.GREEN, 2)
+func _draw():
+	if navigationAgent and not navigationAgent.is_navigation_finished():
+		var path = navigationAgent.get_current_navigation_path()
+
+		for i in range(path.size()):
+			# Draw circle at each path point in global space, converted to local
+			var local_point = to_local(path[i])
+			draw_circle(local_point, 4, Color.GREEN)
+
+			if i < path.size() - 1:
+				var next_local_point = to_local(path[i + 1])
+				draw_line(local_point, next_local_point, Color.GREEN, 2)
