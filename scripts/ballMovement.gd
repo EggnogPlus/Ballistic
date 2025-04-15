@@ -1,16 +1,28 @@
 extends CharacterBody2D
 
-var acceleration: float = 200
+# Base Movement
+var acceleration: float = 400
 var max_roll_speed: float = 400
-var execute_threshold: float = 700
 var friction: float = 0.01
+
+# Execute vars
+var execute_threshold: float = 600
+var can_execute = false
+
+# Arcade Elements
+var started_moving = false
+var death_timer = 0
+var death_limit = 3.5
+var death_displacement_radius = 50
+var reference_position: Vector2 = Vector2.ZERO  # Center of area
 
 @onready var mesh_instance_2d: MeshInstance2D = $MeshInstance2D
 @onready var camera = get_viewport().get_camera_2d()
 
+# Grappling vars
 var is_grappling: bool = false
 var grapple_point: Vector2 = Vector2.ZERO
-var swing_strength: float = 600
+var swing_strength: float = 400
 var grapple_raycast_node: RayCast2D
 var grapple_drawer: Node2D
 var grapple_max_distance: float = 0.0
@@ -28,7 +40,7 @@ func _ready():
 func _physics_process(delta):
 	if Input.is_action_just_pressed("grapple") and not is_grappling:
 		activate_grapple()
-
+	
 	if is_grappling:
 		swing(delta)
 		grapple_drawer.queue_redraw()
@@ -39,42 +51,76 @@ func _physics_process(delta):
 		if velocity.length() > 5:
 			velocity *= (1 - friction * delta * 30)
 
+	# Check for Debug mesh Modulation TODO add fire animation
 	if velocity.length() > max_roll_speed:
-		mesh_instance_2d.modulate = Color(1, 0, 0)
+		if velocity.length() > execute_threshold:
+			can_execute = true
+			mesh_instance_2d.modulate = Color(0, 1, 0)
+		else:
+			can_execute = false
+			mesh_instance_2d.modulate = Color(1, 0, 0)
 	else:
+		can_execute = false
 		mesh_instance_2d.modulate = Color(1, 1, 1)
-	move_and_slide()
-
-	#TODO fix or remove
-	if not is_grappling and velocity.length() > max_roll_speed:
-		#print(velocity.length())
-		#print(max_roll_speed)
-		for i in range(get_slide_collision_count()):
-			var collision = get_slide_collision(i)
-			var normal = collision.get_normal()
-
-			var impact_alignment = abs(velocity.normalized().dot(normal))
-			var momentum_loss_factor = clamp(impact_alignment, 0.0, 1.0)
-
-			# Lose up to 90% of velocity on a head-on hit
-			var loss_strength = lerp(0.1, 0.9, momentum_loss_factor)
-			velocity *= (1.0 - loss_strength)
 	
-	if velocity.length() > execute_threshold:
-		mesh_instance_2d.modulate = Color(0, 1, 0)
-		for i in range(get_slide_collision_count()):
-			var collision = get_slide_collision(i)
-			var collider = collision.get_collider()
+	# PLAYER INDICATOR TODO 
+	if started_moving and global_position:
+		if death_timer >= death_limit:
+			queue_free()
+		else:
+			if death_timer >= 2.5:
+				mesh_instance_2d.modulate = Color(1, 0, 0)
+			elif death_timer >= 1.5:
+				mesh_instance_2d.modulate = Color(0, 0, 1)
+			elif death_timer >= 0.5:
+				mesh_instance_2d.modulate = Color(0, 1, 0)
 
-			if collider and collider.is_in_group("enemies"):
-				print("Enemy executed!")
-				collider.queue_free()
+	move_and_slide()
+	# Check player collisions if killed enemy
+	check_for_enemy_execution()
+	# Check if player is stuck in the same area
+	update_death_status(delta)
+	
+	queue_redraw()
 
+func _draw():
+	# Draw velocity vector as a blue line
+	if velocity.length() > 0:
+		var velocity_scaled = velocity * 0.1 # Scale for visibility (adjust as needed)
+		draw_line(Vector2.ZERO, velocity_scaled, Color(0, 0, 1), 2.0) # Blue line, 2px thick
+	#if death_timer > 0:
+		#draw_circle(Vector2.ZERO, death_displacement_radius, Color(0, 1, 0, 0.2))  # Semi-transparent green circle
+
+func update_death_status(delta):
+	# Check distance from reference position
+	var distance = global_position.distance_to(reference_position)
+	if distance <= death_displacement_radius:
+		# Player is within radius, increment timer
+		death_timer += delta
+	else:
+		# Player left the area, reset timer and update reference
+		death_timer = 0.0
+		reference_position = global_position
+
+func check_for_enemy_execution():
+	for i in range(get_slide_collision_count()):
+		var collision = get_slide_collision(i)
+		var collider = collision.get_collider()
+		if collider and collider.is_in_group("enemies"):
+			print("------")
+			print("TIME: ", Time.get_datetime_dict_from_system().second)
+			print("VELOCITY: ", velocity.length())
+			print("EXECUTE THRESHOLD: ", execute_threshold)
+			if can_execute and not is_grappling:
+				velocity = velocity * 1.1
+				collider.execute()
+			#region Old execute code - unreliable
+			#if velocity.length() > execute_threshold:
+				#velocity = velocity * 1.1
+				#collider.execute()
+			#endregion
 				if camera and "start_shake" in camera:
 					camera.start_shake(8.0)
-
-	if is_grappling:
-		queue_redraw()
 
 func apply_movement(delta):
 	var input_vector = Vector2.ZERO
@@ -83,7 +129,7 @@ func apply_movement(delta):
 		input_vector.x = -1
 	elif Input.is_action_pressed("ui_right"):
 		input_vector.x = 1
-
+	
 	if Input.is_action_pressed("ui_up"):
 		input_vector.y = -1
 	elif Input.is_action_pressed("ui_down"):
@@ -92,20 +138,32 @@ func apply_movement(delta):
 	input_vector = input_vector.normalized()
 
 	if input_vector != Vector2.ZERO:
+		started_moving = true
 		var input_force = input_vector * acceleration * delta
-
-		if (velocity + input_force).length() < max_roll_speed:
-			velocity += input_force
-		else:
-			#if not in_grapple_momentum:
-			# Momentum steering — influence without cancelling velocity
+		
+		# Apply input force only to axes where velocity component is below max_roll_speed
+		var new_velocity = velocity
+		if abs(velocity.x) < max_roll_speed:
+			new_velocity.x += input_force.x
+		if abs(velocity.y) < max_roll_speed:
+			new_velocity.y += input_force.y
+		
+		# If the new velocity exceeds max_roll_speed in total magnitude, scale it down
+		# but only if the input is increasing the speed in that direction
+		if new_velocity.length() > max_roll_speed:
+			var input_direction = input_force.normalized()
 			var velocity_direction = velocity.normalized()
-			var parallel_component = input_vector.dot(velocity_direction) * velocity_direction
-			var perpendicular_component = input_vector - parallel_component
-			velocity += perpendicular_component  # Adjust delta for appropriate steering strength
-				
-				
+			# Check if input is in the same direction as velocity (dot product > 0)
+			if input_direction.dot(velocity_direction) > 0:
+				# Only allow perpendicular input components to avoid capping grapple momentum
+				var parallel_component = input_direction.dot(velocity_direction) * velocity_direction
+				var perpendicular_component = input_direction - parallel_component
+				var adjusted_force = perpendicular_component * acceleration * delta
+				new_velocity = velocity + adjusted_force
+		
+		velocity = new_velocity
 
+#region Grapple Functions
 func activate_grapple():
 	var nearest_grapple = find_nearest_grapple_point()
 	if nearest_grapple:
@@ -118,6 +176,7 @@ func activate_grapple():
 		print("No grapple point in range!\n")
 
 func swing(delta):
+	started_moving = true
 	var direction_to_grapple = (self.grapple_point - self.global_position).normalized()
 	var current_distance = self.global_position.distance_to(self.grapple_point)
 
@@ -155,3 +214,4 @@ func find_nearest_grapple_point():
 				nearest = grapple
 
 	return nearest
+#endregion

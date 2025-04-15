@@ -7,7 +7,8 @@ enum ENEMY_STATE {PATROLLING, # 0
 					 LOSING, # 1
 					 HUNTING, # 2
 					 BLIND_HUNT} # 3
-# Blind
+
+# Blind Hunt Variables
 var blindHuntTimer = 0
 var blindHuntLimit = 4
 
@@ -66,13 +67,9 @@ func set_new_patrol_target():
 	var target = global_position + random_offset
 	var nav_map = navigationAgent.get_navigation_map()
 	var safe_point = NavigationServer2D.map_get_closest_point(nav_map, target)
-
 	navigationAgent.target_position = safe_point
 
-
-
-
-#region state movements
+#region State movements
 
 func patrolMovement(delta):
 	if navigationAgent.is_navigation_finished():
@@ -96,13 +93,12 @@ func patrolMovement(delta):
 	if global_position.distance_to(next_position) < 5:
 		set_new_patrol_target()
 		return
-	# Avoid spinning if next dot is too close
+		
+	# Avoid spinning if next dot is too close - avoid spinning
 	if path.size() > 1:
-		var next_next_position = path[1]  # index 1 is the "next next" position
-		# If super close to next position - skip it - avoid spinning
+		# If super close to next position - pick new target - wiggle solution
 		if global_position.distance_to(to_next) < 50:
-			print("TOO CLOSE")
-			to_next = global_position.direction_to(next_next_position)
+			set_new_patrol_target()
 
 	var target_angle = to_next.angle() + PI / 2
 	#rotation = lerp_angle(rotation, target_angle, turnSpeed * delta)
@@ -123,7 +119,6 @@ func patrolMovement(delta):
 	
 	velocity = Vector2.UP.rotated(rotation) * speed
 	move_and_slide()
-
 
 func losingMovement(delta):
 	# Move Toward Where player was last seen
@@ -216,9 +211,14 @@ func _physics_process(delta):
 	queue_redraw()
 	if player and is_instance_valid(player):
 		stateActions(delta)
-		
 
-## Draws Enemy Pathing --FYI drawn line does not dissapear
+
+func execute():
+	if is_in_group("enemies"):
+		remove_from_group("enemies")
+	queue_free()
+
+#region Draws Enemy Pathing --FYI drawn line does not dissapear
 #func _draw():
 	#if navigationAgent and not navigationAgent.is_navigation_finished():
 		#var path = navigationAgent.get_current_navigation_path()
@@ -231,3 +231,4 @@ func _physics_process(delta):
 			#if i < path.size() - 1:
 				#var next_local_point = to_local(path[i + 1])
 				#draw_line(local_point, next_local_point, Color.GREEN, 2)
+#endregion
