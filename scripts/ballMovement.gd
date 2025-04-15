@@ -2,9 +2,11 @@ extends CharacterBody2D
 
 var acceleration: float = 200
 var max_roll_speed: float = 400
+var execute_threshold: float = 700
 var friction: float = 0.01
 
 @onready var mesh_instance_2d: MeshInstance2D = $MeshInstance2D
+@onready var camera = get_viewport().get_camera_2d()
 
 var is_grappling: bool = false
 var grapple_point: Vector2 = Vector2.ZERO
@@ -43,6 +45,7 @@ func _physics_process(delta):
 		mesh_instance_2d.modulate = Color(1, 1, 1)
 	move_and_slide()
 
+	#TODO fix or remove
 	if not is_grappling and velocity.length() > max_roll_speed:
 		#print(velocity.length())
 		#print(max_roll_speed)
@@ -56,7 +59,19 @@ func _physics_process(delta):
 			# Lose up to 90% of velocity on a head-on hit
 			var loss_strength = lerp(0.1, 0.9, momentum_loss_factor)
 			velocity *= (1.0 - loss_strength)
+	
+	if velocity.length() > execute_threshold:
+		mesh_instance_2d.modulate = Color(0, 1, 0)
+		for i in range(get_slide_collision_count()):
+			var collision = get_slide_collision(i)
+			var collider = collision.get_collider()
 
+			if collider and collider.is_in_group("enemies"):
+				print("Enemy executed!")
+				collider.queue_free()
+
+				if camera and "start_shake" in camera:
+					camera.start_shake(8.0)
 
 	if is_grappling:
 		queue_redraw()

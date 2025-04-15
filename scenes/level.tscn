@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=4 uid="uid://bmgxsvwcpisca"]
+[gd_scene load_steps=16 format=4 uid="uid://bmgxsvwcpisca"]
 
 [ext_resource type="PackedScene" uid="uid://braj8e5h444ub" path="res://scenes/ball.tscn" id="1_rrr6d"]
 [ext_resource type="Texture2D" uid="uid://dd6745o4vg6uv" path="res://resources/black.png" id="1_y3m47"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://scripts/enemy_spawner.gd" id="3_1jg64"]
 [ext_resource type="Texture2D" uid="uid://bnhs2hjbhbbom" path="res://resources/wallcorner.png" id="4_p4fi6"]
 [ext_resource type="PackedScene" uid="uid://5xm6cf6rc40j" path="res://scenes/enemy.tscn" id="4_vp4j0"]
+[ext_resource type="Script" path="res://scenes/camera_2d.gd" id="7_7npfs"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cefnb"]
 texture = ExtResource("1_y3m47")
@@ -91,6 +92,7 @@ tile_set = SubResource("TileSet_1n38x")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(0.5, 0.5)
+script = ExtResource("7_7npfs")
 
 [node name="EnemySpawner" type="Node2D" parent="." node_paths=PackedStringArray("spawn_points")]
 script = ExtResource("3_1jg64")

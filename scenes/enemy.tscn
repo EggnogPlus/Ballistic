@@ -10,13 +10,13 @@ rotation = 1.5708
 scale = Vector2(3.5, 3.5)
 script = ExtResource("1_7vkuo")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." groups=["enemies"]]
 texture_filter = 1
 rotation = 3.14159
 scale = Vector2(1.2, 1.2)
 texture = ExtResource("2_5pskw")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["enemies"]]
 rotation = 1.5708
 shape = SubResource("CircleShape2D_vsbha")
 
