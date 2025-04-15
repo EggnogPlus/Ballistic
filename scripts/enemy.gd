@@ -64,13 +64,6 @@ func set_new_patrol_target():
 	var max_distance := 3000
 	var random_offset = Vector2.RIGHT.rotated(randf_range(0, TAU)) * randf_range(300, max_distance)
 	var target = global_position + random_offset
-
-	# Avoid other enemies
-	var enemies = get_tree().get_nodes_in_group("enemies")  # Assuming all enemies are in the "enemies" group
-	for enemy in enemies:
-		if enemy != self and global_position.distance_to(enemy.global_position) < 100:  # 100 is the avoidance distance
-			target = global_position + (target - global_position).normalized() * 150  # Move target away from the enemy
-	
 	var nav_map = navigationAgent.get_navigation_map()
 	var safe_point = NavigationServer2D.map_get_closest_point(nav_map, target)
 
@@ -87,6 +80,16 @@ func patrolMovement(delta):
 
 	var path = navigationAgent.get_current_navigation_path() # full path
 	var next_position = navigationAgent.get_next_path_position()
+	
+	# Avoid other enemies
+	var enemies = get_tree().get_nodes_in_group("enemies")  # Assuming all enemies are in the "enemies" group
+	var avoidance_vector = Vector2.ZERO
+	for enemy in enemies:
+		if enemy != self and global_position.distance_to(enemy.global_position) < 100:
+			var repulsion = (global_position - enemy.global_position).normalized() * 100
+			avoidance_vector += repulsion
+	next_position += avoidance_vector
+	
 	var to_next = global_position.direction_to(next_position)
 	
 	# Avoid spinning if we're too close to the point
@@ -97,15 +100,29 @@ func patrolMovement(delta):
 	if path.size() > 1:
 		var next_next_position = path[1]  # index 1 is the "next next" position
 		# If super close to next position - skip it - avoid spinning
-		if global_position.distance_to(to_next) < 15:
+		if global_position.distance_to(to_next) < 50:
+			print("TOO CLOSE")
 			to_next = global_position.direction_to(next_next_position)
 
 	var target_angle = to_next.angle() + PI / 2
-	rotation = lerp_angle(rotation, target_angle, turnSpeed * delta)
+	#rotation = lerp_angle(rotation, target_angle, turnSpeed * delta)
+	
+	var angle_diff = abs(wrapf(rotation - target_angle, -PI, PI))
+	var effective_turn_speed = turnSpeed
+	if global_position.distance_to(next_position) < 50:
+		effective_turn_speed *= 3
 
+	rotation = lerp_angle(rotation, target_angle, effective_turn_speed * delta)
+
+	# Only move if mostly facing the target
+	if angle_diff < 0.5:
+		velocity = Vector2.UP.rotated(rotation) * speed
+	else:
+		velocity = Vector2.ZERO
+
+	
 	velocity = Vector2.UP.rotated(rotation) * speed
 	move_and_slide()
-
 
 
 func losingMovement(delta):
@@ -202,15 +219,15 @@ func _physics_process(delta):
 		
 
 ## Draws Enemy Pathing --FYI drawn line does not dissapear
-func _draw():
-	if navigationAgent and not navigationAgent.is_navigation_finished():
-		var path = navigationAgent.get_current_navigation_path()
-
-		for i in range(path.size()):
-			# Draw circle at each path point in global space, converted to local
-			var local_point = to_local(path[i])
-			draw_circle(local_point, 4, Color.GREEN)
-
-			if i < path.size() - 1:
-				var next_local_point = to_local(path[i + 1])
-				draw_line(local_point, next_local_point, Color.GREEN, 2)
+#func _draw():
+	#if navigationAgent and not navigationAgent.is_navigation_finished():
+		#var path = navigationAgent.get_current_navigation_path()
+#
+		#for i in range(path.size()):
+			## Draw circle at each path point in global space, converted to local
+			#var local_point = to_local(path[i])
+			#draw_circle(local_point, 4, Color.GREEN)
+#
+			#if i < path.size() - 1:
+				#var next_local_point = to_local(path[i + 1])
+				#draw_line(local_point, next_local_point, Color.GREEN, 2)

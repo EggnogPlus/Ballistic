@@ -44,8 +44,8 @@ func _physics_process(delta):
 	move_and_slide()
 
 	if not is_grappling and velocity.length() > max_roll_speed:
-		print(velocity.length())
-		print(max_roll_speed)
+		#print(velocity.length())
+		#print(max_roll_speed)
 		for i in range(get_slide_collision_count()):
 			var collision = get_slide_collision(i)
 			var normal = collision.get_normal()
@@ -84,7 +84,6 @@ func apply_movement(delta):
 		else:
 			#if not in_grapple_momentum:
 			# Momentum steering — influence without cancelling velocity
-			print("3:")
 			var velocity_direction = velocity.normalized()
 			var parallel_component = input_vector.dot(velocity_direction) * velocity_direction
 			var perpendicular_component = input_vector - parallel_component
