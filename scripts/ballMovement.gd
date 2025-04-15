@@ -38,8 +38,11 @@ func _ready():
 		print("Error: GrappleDrawer node not found!")
 
 func _physics_process(delta):
-	if Input.is_action_just_pressed("grapple") and not is_grappling:
-		activate_grapple()
+	if Input.is_action_just_pressed("grapple"):
+		if is_grappling:
+			release_grapple()
+		else:
+			activate_grapple()
 	
 	if is_grappling:
 		swing(delta)
@@ -192,9 +195,6 @@ func swing(delta):
 
 	var swing_force = tangent_direction * self.swing_strength * delta
 	self.velocity += swing_force
-
-	if Input.is_action_just_pressed("release_grapple"):
-		release_grapple()
 
 func release_grapple():
 	is_grappling = false
