@@ -12,10 +12,14 @@ var on_start_menu = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	#visible = true
+	print("-- Starting New Instance --")
+	screen_on()
+
+func screen_on():
+	on_start_menu = true
+	EnemySpawner.delete_all_enemies()
+	visible = true
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	print("-- Started New Instance --")
-	#pause_menu.toggle_pause() # Pause game initially
 	get_node("/root/Level/Player/ball").queue_free() # Remove ball child of player
 	play_button.connect("pressed", Callable(self, "on_play_pressed"))
 	quit_to_desktop_button.connect("pressed", Callable(self, "on_qtd_pressed"))

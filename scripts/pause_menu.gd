@@ -1,12 +1,14 @@
 extends Control
 
 @onready var resume_button =  $NinePatchRect/VBoxContainer4/ResumeButton 
-
+@onready var qts_button = $NinePatchRect/VBoxContainer3/QTSButton
+@onready var start_menu = get_node("../StartMenu")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	visible = false
 	resume_button.connect("pressed", Callable(self, "toggle_pause"))
+	qts_button.connect("pressed", Callable(self, "on_quit_to_start_pressed"))
 
 func _unhandled_input(event):
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
@@ -21,5 +23,6 @@ func toggle_pause():
 	else:
 		print("Game paused")
 
-func _on_resume_pressed():
+func on_quit_to_start_pressed():
+	start_menu.screen_on()
 	toggle_pause()
