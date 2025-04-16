@@ -29,6 +29,7 @@ var target_direction: Vector2
 @onready var visionCone = $Area2D
 @onready var player = get_node_or_null("/root/Level/Player/ball")
 @onready var navigationAgent: NavigationAgent2D = $NavigationAgent2D
+@onready var start_menu = get_node("../StartMenu")
 
 #endregion
 
@@ -209,9 +210,14 @@ func stateActions(delta):
 ## Function constally run for enemy
 func _physics_process(delta):
 	queue_redraw()
-	if player and is_instance_valid(player):
-		stateActions(delta)
 
+	if not is_instance_valid(player):
+		var possible_player = get_node_or_null("/root/Level/Player/ball")
+		if possible_player:
+			player = possible_player
+
+	if start_menu.on_start_menu or (player and is_instance_valid(player)):
+		stateActions(delta)
 
 func execute():
 	if is_in_group("enemies"):

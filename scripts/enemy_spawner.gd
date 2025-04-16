@@ -20,3 +20,8 @@ func spawn_enemy():
 		var enemy = enemy_scene.instantiate()
 		enemy.global_position = spawn_point.global_position
 		get_tree().current_scene.add_child(enemy)
+
+func delete_all_enemies():
+	var enemies = get_tree().get_nodes_in_group("enemies")
+	for enemy in enemies:
+		enemy.execute()

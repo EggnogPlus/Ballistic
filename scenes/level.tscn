@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=4 uid="uid://bmgxsvwcpisca"]
+[gd_scene load_steps=19 format=4 uid="uid://bmgxsvwcpisca"]
 
 [ext_resource type="PackedScene" uid="uid://braj8e5h444ub" path="res://scenes/ball.tscn" id="1_rrr6d"]
 [ext_resource type="Texture2D" uid="uid://dd6745o4vg6uv" path="res://resources/black.png" id="1_y3m47"]
@@ -8,8 +8,10 @@
 [ext_resource type="Script" path="res://scripts/enemy_spawner.gd" id="3_1jg64"]
 [ext_resource type="Texture2D" uid="uid://bnhs2hjbhbbom" path="res://resources/wallcorner.png" id="4_p4fi6"]
 [ext_resource type="PackedScene" uid="uid://5xm6cf6rc40j" path="res://scenes/enemy.tscn" id="4_vp4j0"]
-[ext_resource type="Script" path="res://scenes/camera_2d.gd" id="7_7npfs"]
+[ext_resource type="Script" path="res://scripts/camera_2d.gd" id="7_7npfs"]
 [ext_resource type="PackedScene" uid="uid://r4t35m6ajhx0" path="res://scenes/pause_menu.tscn" id="10_vn8p4"]
+[ext_resource type="PackedScene" uid="uid://d0ysoqod5fqb5" path="res://scenes/start_menu.tscn" id="11_lkip5"]
+[ext_resource type="Script" path="res://scripts/respawnmanager.gd" id="12_u4mvr"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cefnb"]
 texture = ExtResource("1_y3m47")
@@ -117,4 +119,11 @@ rotation = 3.14159
 
 [node name="SpawnPoint5" type="Marker2D" parent="EnemySpawner"]
 
+[node name="StartMenu" parent="." instance=ExtResource("11_lkip5")]
+process_mode = 3
+
 [node name="PauseMenu" parent="." instance=ExtResource("10_vn8p4")]
+process_mode = 3
+
+[node name="RespawnManager" type="Node" parent="."]
+script = ExtResource("12_u4mvr")
