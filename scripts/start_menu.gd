@@ -7,6 +7,7 @@ extends Control
 @onready var player = get_node("../Player")
 @onready var RespawnManager = get_node("../RespawnManager")
 @onready var EnemySpawner = get_node("../EnemySpawner")
+@onready var TimeOverlay = get_node("../TimeOverlay")
 
 var on_start_menu = true
 
@@ -31,6 +32,7 @@ func on_play_pressed():
 	on_start_menu = false
 	EnemySpawner.delete_all_enemies()
 	RespawnManager.respawn_at(Vector2(0, 0))
+	TimeOverlay.show_time()
 	
 	
 func on_qtd_pressed():

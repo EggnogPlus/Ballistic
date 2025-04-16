@@ -3,6 +3,7 @@ extends Control
 @onready var resume_button =  $NinePatchRect/VBoxContainer4/ResumeButton 
 @onready var qts_button = $NinePatchRect/VBoxContainer3/QTSButton
 @onready var start_menu = get_node("../StartMenu")
+@onready var TimeOverlay = get_node("../TimeOverlay")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -14,7 +15,7 @@ func _unhandled_input(event):
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		toggle_pause()
 
-func toggle_pause():	
+func toggle_pause():
 	var is_paused = get_tree().paused
 	get_tree().paused = !is_paused
 	visible = !is_paused
@@ -25,4 +26,5 @@ func toggle_pause():
 
 func on_quit_to_start_pressed():
 	start_menu.screen_on()
+	TimeOverlay.hide_time()
 	toggle_pause()
