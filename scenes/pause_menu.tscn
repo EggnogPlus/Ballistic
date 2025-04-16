@@ -1,9 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://r4t35m6ajhx0"]
+[gd_scene load_steps=5 format=3 uid="uid://r4t35m6ajhx0"]
 
 [ext_resource type="Texture2D" uid="uid://olwm4oym38vu" path="res://resources/wall.png" id="1_byuf0"]
+[ext_resource type="Script" path="res://scenes/pause_menu.gd" id="1_iu4yf"]
 [ext_resource type="FontFile" uid="uid://d0e2ryhglefdm" path="res://resources/PixelifySans-VariableFont_wght.ttf" id="2_y133p"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ho311"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_e4p0n"]
 
 [node name="PauseMenu" type="Control"]
 layout_mode = 3
@@ -12,6 +13,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(2, 2)
+script = ExtResource("1_iu4yf")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="."]
 texture_filter = 1
@@ -24,12 +27,10 @@ anchor_bottom = 0.5
 offset_left = -150.0
 offset_top = -200.0
 offset_right = 150.0
-offset_bottom = 200.0
+offset_bottom = 100.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("1_byuf0")
-patch_margin_top = 1
-patch_margin_bottom = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="NinePatchRect"]
 layout_mode = 1
@@ -38,21 +39,40 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -109.5
-offset_top = -167.0
-offset_right = 109.5
-offset_bottom = 167.0
+offset_left = -109.0
+offset_top = -120.0
+offset_right = 110.0
+offset_bottom = -71.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="RichTextLabel" type="RichTextLabel" parent="NinePatchRect/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/normal_font = ExtResource("2_y133p")
+theme_override_font_sizes/normal_font_size = 35
 bbcode_enabled = true
-text = "[center]BALLISTIC
+text = "[center] -- PAUSED --
 "
 fit_content = true
 scroll_active = false
+
+[node name="VBoxContainer4" type="VBoxContainer" parent="NinePatchRect"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -102.5
+offset_top = 70.0
+offset_right = 102.5
+offset_bottom = 115.0
+grow_horizontal = 2
+
+[node name="ResumeButton" type="MenuButton" parent="NinePatchRect/VBoxContainer4"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_y133p")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/focus = SubResource("StyleBoxEmpty_e4p0n")
+text = "- RESUME -"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="NinePatchRect"]
 layout_mode = 1
@@ -61,27 +81,49 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -109.5
-offset_top = -50.5
-offset_right = 109.5
-offset_bottom = 50.5
+offset_left = -112.5
+offset_top = -29.0
+offset_right = 112.5
+offset_bottom = 69.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CheckButton1" type="CheckButton" parent="NinePatchRect/VBoxContainer2"]
+[node name="RichTextLabel2" type="RichTextLabel" parent="NinePatchRect/VBoxContainer2"]
+visible = false
 layout_mode = 2
-theme_override_styles/focus = SubResource("StyleBoxEmpty_ho311")
-button_pressed = true
-text = "COLOR #1"
+theme_override_fonts/italics_font = ExtResource("2_y133p")
+theme_override_font_sizes/italics_font_size = 19
+bbcode_enabled = true
+text = "[center][i]Note - You Cannot kill enemies while grappling"
+fit_content = true
 
-[node name="CheckButton2" type="CheckButton" parent="NinePatchRect/VBoxContainer2"]
+[node name="RichTextLabel3" type="RichTextLabel" parent="NinePatchRect/VBoxContainer2"]
 layout_mode = 2
-theme_override_styles/focus = SubResource("StyleBoxEmpty_ho311")
-button_pressed = true
-text = "COLOR #1"
+theme_override_fonts/normal_font = ExtResource("2_y133p")
+theme_override_font_sizes/normal_font_size = 18
+bbcode_enabled = true
+text = "[center][b] -- Controls -- [/b][/center]
+	 ←↑→↓		   -	Movement
+	 SPACE		   -		Grapple"
+fit_content = true
 
-[node name="CheckButton3" type="CheckButton" parent="NinePatchRect/VBoxContainer2"]
+[node name="VBoxContainer3" type="VBoxContainer" parent="NinePatchRect"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -50.0
+offset_top = -65.0
+offset_right = 50.0
+offset_bottom = -34.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MenuButton" type="MenuButton" parent="NinePatchRect/VBoxContainer3"]
 layout_mode = 2
-theme_override_styles/focus = SubResource("StyleBoxEmpty_ho311")
-button_pressed = true
-text = "COLOR #1"
+theme_override_fonts/font = ExtResource("2_y133p")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/focus = SubResource("StyleBoxEmpty_e4p0n")
+text = "- QUIT TO START -"

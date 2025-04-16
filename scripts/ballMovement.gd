@@ -38,6 +38,7 @@ func _ready():
 		print("Error: GrappleDrawer node not found!")
 
 func _physics_process(delta):
+	
 	if Input.is_action_just_pressed("grapple"):
 		if is_grappling:
 			release_grapple()
@@ -94,6 +95,7 @@ func _draw():
 	#if death_timer > 0:
 		#draw_circle(Vector2.ZERO, death_displacement_radius, Color(0, 1, 0, 0.2))  # Semi-transparent green circle
 
+#region Death & Execution AND apply_movement 
 func update_death_status(delta):
 	# Check distance from reference position
 	var distance = global_position.distance_to(reference_position)
@@ -165,6 +167,8 @@ func apply_movement(delta):
 				new_velocity = velocity + adjusted_force
 		
 		velocity = new_velocity
+
+#endregion
 
 #region Grapple Functions
 func activate_grapple():
