@@ -19,9 +19,13 @@ func _ready() -> void:
 func screen_on():
 	screen_saver_movement = true
 	EnemySpawner.delete_all_enemies()
+	EnemySpawner.CAN_SPAWN = true
 	visible = true
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	get_node("/root/Level/Player/ball").queue_free() # Remove ball child of player
+	
+	var ball = get_node("/root/Level/Player/ball")
+	if ball:
+		ball.queue_free() # Remove ball child of player
 	play_button.connect("pressed", Callable(self, "on_play_pressed"))
 	quit_to_desktop_button.connect("pressed", Callable(self, "on_qtd_pressed"))
 

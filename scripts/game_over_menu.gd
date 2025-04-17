@@ -3,8 +3,12 @@ extends Control
 @onready var play_button = $NinePatchRect/VBoxContainer4/PlayButton
 @onready var quit_to_start_button = $NinePatchRect/VBoxContainer3/QTSButton
 @onready var score_text = $NinePatchRect/VBoxContainer2/ScoreText
+@onready var start_menu = get_node("../StartMenu")
+@onready var EnemySpawner = get_node("../EnemySpawner")
+@onready var RespawnManager = get_node("../RespawnManager")
+@onready var TimeOverlay = get_node("../TimeOverlay")
 
-
+var added_time = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -15,11 +19,18 @@ func _ready() -> void:
 
 func on_play_pressed():
 	visible = false
-	#screen_saver_movement = false
-	#EnemySpawner.delete_all_enemies()
-	#RespawnManager.respawn_at(Vector2(0, 0))
-	#TimeOverlay.show_time()
+	start_menu.screen_saver_movement = false
+	EnemySpawner.delete_all_enemies()
+	RespawnManager.respawn_at(Vector2(0, 0))
+	TimeOverlay.show_time()
+
+func on_qts_pressed():
+	visible = false
+	start_menu.screen_on()
+	TimeOverlay.hide_time()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	pass
+	if not added_time and visible:
+		added_time = true
+		score_text.add_text("TimeOverlay.time_elapsed")
