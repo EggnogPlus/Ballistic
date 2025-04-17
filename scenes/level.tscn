@@ -139,9 +139,6 @@ offset_top = -600.0
 offset_right = -119.0
 offset_bottom = -600.0
 
-[node name="RespawnManager" type="Node" parent="."]
-script = ExtResource("12_u4mvr")
-
 [node name="AboutMenu" parent="." instance=ExtResource("15_efggo")]
 anchors_preset = 0
 anchor_right = 0.0
@@ -152,3 +149,6 @@ offset_right = -50.0
 offset_bottom = -50.0
 grow_horizontal = 1
 grow_vertical = 1
+
+[node name="RespawnManager" type="Node" parent="."]
+script = ExtResource("12_u4mvr")
