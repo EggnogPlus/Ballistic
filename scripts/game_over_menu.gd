@@ -32,5 +32,9 @@ func on_qts_pressed():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if not added_time and visible:
+		TimeOverlay.visible = false
 		added_time = true
-		score_text.add_text("TimeOverlay.time_elapsed")
+		var minutes = int(TimeOverlay.time_elapsed) / 60
+		var seconds = int(TimeOverlay.time_elapsed) % 60
+		var milliseconds = int((TimeOverlay.time_elapsed - int(TimeOverlay.time_elapsed)) * 100)
+		score_text.add_text(" %02d:%02d.%02d" % [minutes, seconds, milliseconds])
