@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=4 uid="uid://bmgxsvwcpisca"]
+[gd_scene load_steps=21 format=4 uid="uid://bmgxsvwcpisca"]
 
 [ext_resource type="PackedScene" uid="uid://braj8e5h444ub" path="res://scenes/ball.tscn" id="1_rrr6d"]
 [ext_resource type="Texture2D" uid="uid://dd6745o4vg6uv" path="res://resources/black.png" id="1_y3m47"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://d0ysoqod5fqb5" path="res://scenes/start_menu.tscn" id="11_lkip5"]
 [ext_resource type="Script" path="res://scripts/respawnmanager.gd" id="12_u4mvr"]
 [ext_resource type="PackedScene" uid="uid://dfrp5kd48gspj" path="res://scenes/time_overlay.tscn" id="13_m2g1t"]
+[ext_resource type="PackedScene" uid="uid://c2lwbvryxjnpd" path="res://scenes/game_over_menu.tscn" id="14_mckax"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cefnb"]
 texture = ExtResource("1_y3m47")
@@ -120,19 +121,20 @@ rotation = 3.14159
 
 [node name="SpawnPoint5" type="Marker2D" parent="EnemySpawner"]
 
+[node name="GameOverMenu" parent="." instance=ExtResource("14_mckax")]
+process_mode = 3
+
 [node name="StartMenu" parent="." instance=ExtResource("11_lkip5")]
 process_mode = 3
-visible = false
 
 [node name="PauseMenu" parent="." instance=ExtResource("10_vn8p4")]
 process_mode = 3
-visible = false
-
-[node name="RespawnManager" type="Node" parent="."]
-script = ExtResource("12_u4mvr")
 
 [node name="TimeOverlay" parent="." instance=ExtResource("13_m2g1t")]
 offset_left = -119.0
 offset_top = -600.0
 offset_right = -119.0
 offset_bottom = -600.0
+
+[node name="RespawnManager" type="Node" parent="."]
+script = ExtResource("12_u4mvr")
