@@ -123,12 +123,15 @@ rotation = 3.14159
 
 [node name="GameOverMenu" parent="." instance=ExtResource("14_mckax")]
 process_mode = 3
+z_index = 2
 
 [node name="StartMenu" parent="." instance=ExtResource("11_lkip5")]
 process_mode = 3
+z_index = 2
 
 [node name="PauseMenu" parent="." instance=ExtResource("10_vn8p4")]
 process_mode = 3
+z_index = 1
 
 [node name="TimeOverlay" parent="." instance=ExtResource("13_m2g1t")]
 offset_left = -119.0

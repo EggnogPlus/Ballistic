@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 var speed: float = 100.0
-var huntSpeed: float = 250.0
+var huntSpeed: float = 200.0
 var turnSpeed = 2.0
 enum ENEMY_STATE {PATROLLING, # 0
 					 LOSING, # 1

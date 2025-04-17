@@ -16,6 +16,22 @@ var death_limit = 3.5
 var death_displacement_radius = 50
 var reference_position: Vector2 = Vector2.ZERO  # Center of area
 
+# Glow properties
+var glow_radius: float = 12.5  # Radius of the glow circle (adjust to match player size)
+var glow_width: float = 3.0    # Thickness of the glow line
+var glow_color: Color = Color(1.0, 0.0, 0.0, 1.0)  # Red glow
+var glow_points: int = 32      # Number of points for circle approximation
+
+# Trail properties
+var trail_length: float = 0.1 # Scale factor for trail lines (shorter than original 0.1)
+var trail_width: float = 3    # Width of trail lines
+var trail_offset: float = 5.0   # Offset distance for left/right lines
+var trail_dash_length: float = 4.0  # Length of dashes
+var trail_gap_length: float = 4.0   # Gap between dashes
+var trail_color_slow: Color = Color(1.0, 1.0, 1.0, 1.0)  # white trail
+var trail_color_fast: Color = Color(1.0, 0.0, 0.0, 1.0)  # Red trail
+var trail_dash_offset: float = 3.0  # Forward/backward offset magnitude
+
 @onready var mesh_instance_2d: MeshInstance2D = $MeshInstance2D
 @onready var camera = get_viewport().get_camera_2d()
 @onready var grapple_raycast_node: RayCast2D = get_node("/root/Level/Player/GrappleRaycast")
@@ -62,7 +78,7 @@ func _physics_process(delta):
 	# Check for Debug mesh Modulation TODO add fire animation
 	if velocity.length() > execute_threshold:
 		can_execute = true
-		mesh_instance_2d.modulate = Color(1, 0, 0)
+		mesh_instance_2d.modulate = Color(1, 1, 1)
 	else:
 		can_execute = false
 		mesh_instance_2d.modulate = Color(1, 1, 1)
@@ -87,11 +103,35 @@ func _physics_process(delta):
 	queue_redraw()
 
 func _draw():
+	# Draw velocity trail (three red/white dotted lines)
 	if velocity.length() > 0:
-		var velocity_scaled = velocity * 0.1
-		draw_line(Vector2.ZERO, velocity_scaled, Color(1, 1, 1), 3.0) # -velocity_scaled has trailing line
-	#if death_timer > 0:
-		#draw_circle(Vector2.ZERO, death_displacement_radius, Color(0, 1, 0, 0.2))
+		var trail_color = trail_color_fast if can_execute else trail_color_slow
+		var velocity_scaled = velocity * trail_length
+		var trail_end = -velocity_scaled  # Trail behind the ball
+		var perp_vector = Vector2(-velocity_scaled.y, velocity_scaled.x).normalized() * trail_offset
+		var dir = (trail_end - Vector2.ZERO).normalized()
+		
+		# Draw three dashed lines: center, left, right with dynamic offsets
+		for i in range(3):
+			var offset = Vector2.ZERO
+			if i == 1:
+				offset = perp_vector
+			elif i == 2:
+				offset = -perp_vector
+			
+			# Apply cyclic offset to start/end points
+			var time = float(Time.get_ticks_msec()) / 500.0  # Animate over time
+			var dash_offset
+			if i == 1:
+				dash_offset = trail_dash_offset * cos(time * 5.0 + i * 2.0)  # Vary per line
+			else:
+				dash_offset = trail_dash_offset * sin(time * 5.0 + i * 2.0)  # Vary per line
+				
+			var start = offset + dir * dash_offset
+			var end = trail_end + offset + dir * dash_offset
+			
+			draw_dashed_line(start, end, trail_color, trail_width, trail_dash_length, trail_gap_length)
+
 
 #region Death & Execution AND apply_movement 
 
