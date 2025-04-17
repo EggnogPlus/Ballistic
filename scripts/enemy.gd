@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 var speed: float = 100.0
-var huntSpeed: float = 150.0
+var huntSpeed: float = 250.0
 var turnSpeed = 2.0
 enum ENEMY_STATE {PATROLLING, # 0
 					 LOSING, # 1
@@ -198,13 +198,13 @@ func stateActions(delta):
 			sprite.modulate = Color(1, 1, 1)
 			patrolMovement(delta)
 		1: # LOSING
-			sprite.modulate = Color(1, 0, 1)
+			sprite.modulate = Color(0.5, 0.5, 0.5)
 			losingMovement(delta)
 		2: # HUNTING
 			sprite.modulate = Color(1, 0, 0)
 			huntingMovement(delta)
 		3: # BLIND_HUNT
-			sprite.modulate = Color(0, 1, 0)
+			sprite.modulate = Color(0.6, 0, 0)
 			blindMovement(delta)
 
 ## Function constally run for enemy

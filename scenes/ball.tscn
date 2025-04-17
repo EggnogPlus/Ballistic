@@ -5,7 +5,7 @@
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_afshr"]
 
-[sub_resource type="SphereMesh" id="SphereMesh_i8l8r"]
+[sub_resource type="SphereMesh" id="SphereMesh_wcu57"]
 
 [node name="Player" type="Node2D"]
 scale = Vector2(1.5, 1.5)
@@ -18,7 +18,7 @@ shape = SubResource("CircleShape2D_afshr")
 
 [node name="MeshInstance2D" type="MeshInstance2D" parent="ball"]
 scale = Vector2(19.7955, 19.7239)
-mesh = SubResource("SphereMesh_i8l8r")
+mesh = SubResource("SphereMesh_wcu57")
 
 [node name="GrappleLine" type="Line2D" parent="ball"]
 

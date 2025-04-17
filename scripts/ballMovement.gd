@@ -60,13 +60,9 @@ func _physics_process(delta):
 			velocity *= (1 - friction * delta * 30)
 
 	# Check for Debug mesh Modulation TODO add fire animation
-	if velocity.length() > max_roll_speed:
-		if velocity.length() > execute_threshold:
-			can_execute = true
-			mesh_instance_2d.modulate = Color(0, 1, 0)
-		else:
-			can_execute = false
-			mesh_instance_2d.modulate = Color(1, 0, 0)
+	if velocity.length() > execute_threshold:
+		can_execute = true
+		mesh_instance_2d.modulate = Color(1, 0, 0)
 	else:
 		can_execute = false
 		mesh_instance_2d.modulate = Color(1, 1, 1)
@@ -77,11 +73,11 @@ func _physics_process(delta):
 			die()
 		else:
 			if death_timer >= 2.5:
-				mesh_instance_2d.modulate = Color(1, 0, 0)
+				mesh_instance_2d.modulate = Color(0.25, 0.25, 0.25)
 			elif death_timer >= 1.5:
-				mesh_instance_2d.modulate = Color(0, 0, 1)
+				mesh_instance_2d.modulate = Color(0.5, 0.5, 0.5)
 			elif death_timer >= 0.5:
-				mesh_instance_2d.modulate = Color(0, 1, 0)
+				mesh_instance_2d.modulate = Color(0.8, 0.8, 0.8)
 
 	move_and_slide()
 	check_for_enemy_execution()
@@ -119,10 +115,6 @@ func check_for_enemy_execution():
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
 		if collider and collider.is_in_group("enemies"):
-			print("------")
-			print("TIME: ", Time.get_datetime_dict_from_system().second)
-			print("VELOCITY: ", velocity.length())
-			print("EXECUTE THRESHOLD: ", execute_threshold)
 			if can_execute and not is_grappling:
 				velocity = velocity * 1.1
 				collider.execute()
@@ -169,7 +161,7 @@ func activate_grapple():
 		grapple_drawer.is_grappling = true
 		grapple_drawer.grapple_point = grapple_point
 	else:
-		print("No grapple point in range!\n")
+		pass
 
 func swing(delta):
 	started_moving = true

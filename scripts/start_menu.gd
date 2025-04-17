@@ -31,7 +31,6 @@ func screen_on():
 
 
 func on_play_pressed():
-	print("Play Pressed")
 	visible = false
 	screen_saver_movement = false
 	EnemySpawner.delete_all_enemies()
@@ -42,7 +41,7 @@ func on_play_pressed():
 func on_qtd_pressed():
 	print("Quiting...")
 	get_tree().quit()
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+	
+	
 func _process(delta: float) -> void:
 	pass

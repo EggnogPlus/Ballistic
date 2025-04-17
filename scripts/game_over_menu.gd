@@ -21,6 +21,7 @@ func on_play_pressed():
 	visible = false
 	start_menu.screen_saver_movement = false
 	EnemySpawner.delete_all_enemies()
+	EnemySpawner.CAN_SPAWN = true
 	RespawnManager.respawn_at(Vector2(0, 0))
 	TimeOverlay.show_time()
 
