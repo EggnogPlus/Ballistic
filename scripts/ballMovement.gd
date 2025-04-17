@@ -20,6 +20,10 @@ var reference_position: Vector2 = Vector2.ZERO  # Center of area
 @onready var camera = get_viewport().get_camera_2d()
 @onready var grapple_raycast_node: RayCast2D = get_node("/root/Level/Player/GrappleRaycast")
 @onready var grapple_drawer: Node2D = get_node("/root/Level/Player/GrappleDrawer")
+@onready var TimeOverlay = get_node("/root/Level/TimeOverlay")
+@onready var EnemySpawner = get_node("/root/Level/EnemySpawner")
+@onready var StartMenu = get_node("/root/Level/StartMenu")
+@onready var GameOverMenu = get_node("/root/Level/GameOverMenu")
 
 # Grappling vars
 var is_grappling: bool = false
@@ -70,7 +74,7 @@ func _physics_process(delta):
 	# PLAYER INDICATOR TODO 
 	if started_moving and global_position:
 		if death_timer >= death_limit:
-			queue_free()
+			die()
 		else:
 			if death_timer >= 2.5:
 				mesh_instance_2d.modulate = Color(1, 0, 0)
@@ -81,7 +85,8 @@ func _physics_process(delta):
 
 	move_and_slide()
 	check_for_enemy_execution()
-	update_death_status(delta)
+	if started_moving:
+		update_death_status(delta)
 	
 	queue_redraw()
 
@@ -93,6 +98,14 @@ func _draw():
 		#draw_circle(Vector2.ZERO, death_displacement_radius, Color(0, 1, 0, 0.2))
 
 #region Death & Execution AND apply_movement 
+
+func die():
+	queue_free()
+	TimeOverlay.stop_timer()
+	StartMenu.screen_saver_movement = true
+	EnemySpawner.CAN_SPAWN = false
+	GameOverMenu.visible = true
+
 func update_death_status(delta):
 	var distance = global_position.distance_to(reference_position)
 	if distance <= death_displacement_radius:

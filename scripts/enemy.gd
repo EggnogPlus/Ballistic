@@ -216,7 +216,7 @@ func _physics_process(delta):
 		if possible_player:
 			player = possible_player
 
-	if start_menu.on_start_menu or (player and is_instance_valid(player)):
+	if start_menu.screen_saver_movement or (player and is_instance_valid(player)):
 		stateActions(delta)
 
 func execute():

@@ -6,6 +6,7 @@ extends Node
 
 var timer := 0.0
 var max_enemies = 15
+var CAN_SPAWN = true
 
 func _process(delta):
 	timer += delta
@@ -15,7 +16,7 @@ func _process(delta):
 
 func spawn_enemy():
 	var num_enemies = get_tree().get_nodes_in_group("enemies").size()
-	if enemy_scene and spawn_points.size() > 0 and num_enemies < max_enemies:
+	if enemy_scene and spawn_points.size() > 0 and num_enemies < max_enemies and CAN_SPAWN:
 		var spawn_point = spawn_points.pick_random()
 		var enemy = enemy_scene.instantiate()
 		enemy.global_position = spawn_point.global_position

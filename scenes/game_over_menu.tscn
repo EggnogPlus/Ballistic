@@ -1,0 +1,136 @@
+[gd_scene load_steps=5 format=3 uid="uid://c2lwbvryxjnpd"]
+
+[ext_resource type="Script" path="res://scripts/game_over_menu.gd" id="1_i3fj3"]
+[ext_resource type="Texture2D" uid="uid://olwm4oym38vu" path="res://resources/wall.png" id="2_1idkj"]
+[ext_resource type="FontFile" uid="uid://d0e2ryhglefdm" path="res://resources/PixelifySans-VariableFont_wght.ttf" id="3_x16bj"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_e4p0n"]
+
+[node name="GameOverMenu" type="Control"]
+z_index = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2, 2)
+script = ExtResource("1_i3fj3")
+
+[node name="NinePatchRect" type="NinePatchRect" parent="."]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -200.0
+offset_right = 150.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_1idkj")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="NinePatchRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -109.0
+offset_top = -120.0
+offset_right = 110.0
+offset_bottom = -71.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="NinePatchRect/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/normal_font = ExtResource("3_x16bj")
+theme_override_font_sizes/normal_font_size = 35
+bbcode_enabled = true
+text = "[center]GAME OVER
+"
+fit_content = true
+scroll_active = false
+
+[node name="VBoxContainer4" type="VBoxContainer" parent="NinePatchRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -102.5
+offset_top = -50.0
+offset_right = 102.5
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayButton" type="MenuButton" parent="NinePatchRect/VBoxContainer4"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_x16bj")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/focus = SubResource("StyleBoxEmpty_e4p0n")
+text = "- GO AGAIN -"
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="NinePatchRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -114.0
+offset_top = -19.0
+offset_right = 114.0
+offset_bottom = 19.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="QTSButton" type="MenuButton" parent="NinePatchRect/VBoxContainer3"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_x16bj")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/focus = SubResource("StyleBoxEmpty_e4p0n")
+text = "- QUIT TO START -"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="NinePatchRect"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -107.5
+offset_top = -100.0
+offset_right = 107.5
+offset_bottom = -52.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="ScoreText" type="RichTextLabel" parent="NinePatchRect/VBoxContainer2"]
+layout_mode = 2
+theme_override_fonts/normal_font = ExtResource("3_x16bj")
+theme_override_font_sizes/normal_font_size = 25
+bbcode_enabled = true
+text = "SCORE:"
+fit_content = true
+
+[node name="ColorRect" type="ColorRect" parent="NinePatchRect"]
+z_index = -1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -651.0
+offset_top = -355.0
+offset_right = 700.0
+offset_bottom = 701.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)

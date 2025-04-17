@@ -9,7 +9,7 @@ extends Control
 @onready var EnemySpawner = get_node("../EnemySpawner")
 @onready var TimeOverlay = get_node("../TimeOverlay")
 
-var on_start_menu = true
+var screen_saver_movement = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -17,7 +17,7 @@ func _ready() -> void:
 	screen_on()
 
 func screen_on():
-	on_start_menu = true
+	screen_saver_movement = true
 	EnemySpawner.delete_all_enemies()
 	visible = true
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -29,7 +29,7 @@ func screen_on():
 func on_play_pressed():
 	print("Play Pressed")
 	visible = false
-	on_start_menu = false
+	screen_saver_movement = false
 	EnemySpawner.delete_all_enemies()
 	RespawnManager.respawn_at(Vector2(0, 0))
 	TimeOverlay.show_time()
