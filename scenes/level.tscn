@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=4 uid="uid://bmgxsvwcpisca"]
+[gd_scene load_steps=22 format=4 uid="uid://bmgxsvwcpisca"]
 
 [ext_resource type="PackedScene" uid="uid://braj8e5h444ub" path="res://scenes/ball.tscn" id="1_rrr6d"]
 [ext_resource type="Texture2D" uid="uid://dd6745o4vg6uv" path="res://resources/black.png" id="1_y3m47"]
@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://scripts/respawnmanager.gd" id="12_u4mvr"]
 [ext_resource type="PackedScene" uid="uid://dfrp5kd48gspj" path="res://scenes/time_overlay.tscn" id="13_m2g1t"]
 [ext_resource type="PackedScene" uid="uid://c2lwbvryxjnpd" path="res://scenes/game_over_menu.tscn" id="14_mckax"]
+[ext_resource type="PackedScene" uid="uid://b8vm635hcg35g" path="res://scenes/about_menu.tscn" id="15_efggo"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cefnb"]
 texture = ExtResource("1_y3m47")
@@ -140,3 +141,14 @@ offset_bottom = -600.0
 
 [node name="RespawnManager" type="Node" parent="."]
 script = ExtResource("12_u4mvr")
+
+[node name="AboutMenu" parent="." instance=ExtResource("15_efggo")]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = -50.0
+offset_top = -50.0
+offset_right = -50.0
+offset_bottom = -50.0
+grow_horizontal = 1
+grow_vertical = 1

@@ -4,6 +4,7 @@ extends Control
 @onready var qts_button = $NinePatchRect/VBoxContainer3/QTSButton
 @onready var start_menu = get_node("../StartMenu")
 @onready var TimeOverlay = get_node("../TimeOverlay")
+@onready var EnemySpawner = get_node("../EnemySpawner")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -25,6 +26,7 @@ func toggle_pause():
 		print("Game paused")
 
 func on_quit_to_start_pressed():
+	EnemySpawner.delete_all_enemies()
 	start_menu.screen_on()
 	TimeOverlay.hide_time()
 	toggle_pause()

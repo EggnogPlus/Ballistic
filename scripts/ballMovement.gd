@@ -76,7 +76,7 @@ func _physics_process(delta):
 			velocity *= (1 - friction * delta * 30)
 
 	# Check for Debug mesh Modulation TODO add fire animation
-	if velocity.length() > execute_threshold:
+	if velocity.length() > execute_threshold and not is_grappling:
 		can_execute = true
 		mesh_instance_2d.modulate = Color(1, 1, 1)
 	else:

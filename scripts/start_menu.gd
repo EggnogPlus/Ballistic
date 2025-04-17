@@ -2,12 +2,14 @@ extends Control
 
 @onready var play_button =  $NinePatchRect/VBoxContainer4/PlayButton
 @onready var quit_to_desktop_button =  $NinePatchRect/VBoxContainer3/QTDButton
+@onready var about_button = $NinePatchRect/VBoxContainer5/AboutButton
 @onready var pause_menu = get_node("../PauseMenu")
 @onready var bg = $NinePatchRect/ColorRect
 @onready var player = get_node("../Player")
 @onready var RespawnManager = get_node("../RespawnManager")
 @onready var EnemySpawner = get_node("../EnemySpawner")
 @onready var TimeOverlay = get_node("../TimeOverlay")
+@onready var AboutMenu = get_node("../AboutMenu")
 
 var screen_saver_movement = true
 
@@ -18,7 +20,7 @@ func _ready() -> void:
 
 func screen_on():
 	screen_saver_movement = true
-	EnemySpawner.delete_all_enemies()
+	#EnemySpawner.delete_all_enemies() DON'T DELETE WHEN SWITCHING FROM ABOUT
 	EnemySpawner.CAN_SPAWN = true
 	visible = true
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -28,6 +30,7 @@ func screen_on():
 		ball.queue_free() # Remove ball child of player
 	play_button.connect("pressed", Callable(self, "on_play_pressed"))
 	quit_to_desktop_button.connect("pressed", Callable(self, "on_qtd_pressed"))
+	about_button.connect("pressed", Callable(self, "on_about_pressed"))
 
 
 func on_play_pressed():
@@ -37,6 +40,9 @@ func on_play_pressed():
 	RespawnManager.respawn_at(Vector2(0, 0))
 	TimeOverlay.show_time()
 	
+func on_about_pressed():
+	visible = false
+	AboutMenu.screen_on()
 	
 func on_qtd_pressed():
 	print("Quiting...")

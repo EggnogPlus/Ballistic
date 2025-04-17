@@ -27,6 +27,7 @@ func on_play_pressed():
 
 func on_qts_pressed():
 	visible = false
+	EnemySpawner.delete_all_enemies()
 	start_menu.screen_on()
 	TimeOverlay.hide_time()
 

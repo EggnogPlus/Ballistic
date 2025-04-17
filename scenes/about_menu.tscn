@@ -1,0 +1,113 @@
+[gd_scene load_steps=5 format=3 uid="uid://b8vm635hcg35g"]
+
+[ext_resource type="Script" path="res://scripts/about_menu.gd" id="1_rr8mi"]
+[ext_resource type="Texture2D" uid="uid://olwm4oym38vu" path="res://resources/wall.png" id="2_3b3vy"]
+[ext_resource type="FontFile" uid="uid://d0e2ryhglefdm" path="res://resources/PixelifySans-VariableFont_wght.ttf" id="3_qils6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_e4p0n"]
+
+[node name="StartMenu" type="Control"]
+z_index = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2, 2)
+script = ExtResource("1_rr8mi")
+
+[node name="NinePatchRect" type="NinePatchRect" parent="."]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -200.0
+offset_right = 203.0
+offset_bottom = 153.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_3b3vy")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="NinePatchRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -114.0
+offset_top = -113.0
+offset_right = 114.0
+offset_bottom = 87.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="NinePatchRect/VBoxContainer2"]
+layout_mode = 2
+theme_override_fonts/normal_font = ExtResource("3_qils6")
+theme_override_fonts/bold_italics_font = ExtResource("3_qils6")
+theme_override_fonts/bold_font = ExtResource("3_qils6")
+theme_override_font_sizes/bold_italics_font_size = 25
+theme_override_font_sizes/normal_font_size = 20
+theme_override_font_sizes/bold_font_size = 35
+bbcode_enabled = true
+text = "[center][b]BALLISTIC[/b] 
+by Oliver_Barlcay
+
+> Grapple for speed.
+> Speed Kills Enemies.
+> Hesitate, [b][i]Perish[/i][/b]. [/center]
+"
+fit_content = true
+
+[node name="RichTextLabel3" type="RichTextLabel" parent="NinePatchRect/VBoxContainer2"]
+layout_mode = 2
+theme_override_fonts/normal_font = ExtResource("3_qils6")
+theme_override_fonts/bold_font = ExtResource("3_qils6")
+theme_override_font_sizes/normal_font_size = 18
+theme_override_font_sizes/bold_font_size = 22
+bbcode_enabled = true
+text = "[center][b] -- Controls -- [/b][/center]
+	 ←↑→↓		   -	Movement
+	 SPACE		   -		Grapple"
+fit_content = true
+
+[node name="VBoxContainer4" type="VBoxContainer" parent="NinePatchRect"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -102.5
+offset_top = -75.0
+offset_right = 102.5
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="BackButton" type="MenuButton" parent="NinePatchRect/VBoxContainer4"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_qils6")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/focus = SubResource("StyleBoxEmpty_e4p0n")
+text = "- BACK -"
+
+[node name="ColorRect" type="ColorRect" parent="NinePatchRect"]
+z_index = -1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -651.0
+offset_top = -355.0
+offset_right = 700.0
+offset_bottom = 701.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)

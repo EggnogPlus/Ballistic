@@ -43,17 +43,19 @@ anchor_bottom = 0.5
 offset_left = -109.0
 offset_top = -120.0
 offset_right = 110.0
-offset_bottom = -71.0
+offset_bottom = -11.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="RichTextLabel" type="RichTextLabel" parent="NinePatchRect/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/normal_font = ExtResource("3_7380n")
+theme_override_fonts/italics_font = ExtResource("3_7380n")
+theme_override_font_sizes/italics_font_size = 20
 theme_override_font_sizes/normal_font_size = 35
 bbcode_enabled = true
 text = "[center]BALLISTIC
-"
+[i]by Oliver_Barclay[/i][center]"
 fit_content = true
 scroll_active = false
 
@@ -65,9 +67,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -102.5
-offset_top = -50.0
+offset_top = -30.0
 offset_right = 102.5
-offset_bottom = -5.0
+offset_bottom = 15.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -78,6 +80,27 @@ theme_override_font_sizes/font_size = 25
 theme_override_styles/focus = SubResource("StyleBoxEmpty_e4p0n")
 text = "- PLAY -"
 
+[node name="VBoxContainer5" type="VBoxContainer" parent="NinePatchRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -102.5
+offset_top = 10.0
+offset_right = 102.5
+offset_bottom = 55.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AboutButton" type="MenuButton" parent="NinePatchRect/VBoxContainer5"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_7380n")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/focus = SubResource("StyleBoxEmpty_e4p0n")
+text = "- ABOUT -"
+
 [node name="VBoxContainer3" type="VBoxContainer" parent="NinePatchRect"]
 layout_mode = 1
 anchors_preset = 8
@@ -86,9 +109,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -114.0
-offset_top = -19.0
+offset_top = 50.0
 offset_right = 114.0
-offset_bottom = 19.0
+offset_bottom = 88.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -100,6 +123,7 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_e4p0n")
 text = "- QUIT TO DESKTOP -"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="NinePatchRect"]
+visible = false
 layout_mode = 2
 offset_left = 36.0
 offset_top = 218.0
@@ -109,6 +133,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="RichTextLabel2" type="RichTextLabel" parent="NinePatchRect/VBoxContainer2"]
+visible = false
 layout_mode = 2
 theme_override_fonts/italics_font = ExtResource("3_7380n")
 theme_override_font_sizes/italics_font_size = 19
