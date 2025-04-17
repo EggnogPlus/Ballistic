@@ -12,7 +12,7 @@ func _ready() -> void:
 	qts_button.connect("pressed", Callable(self, "on_quit_to_start_pressed"))
 
 func _unhandled_input(event):
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE and not start_menu.screen_saver_movement:
 		toggle_pause()
 
 func toggle_pause():

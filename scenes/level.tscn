@@ -127,7 +127,6 @@ z_index = 2
 
 [node name="StartMenu" parent="." instance=ExtResource("11_lkip5")]
 process_mode = 3
-z_index = 2
 
 [node name="PauseMenu" parent="." instance=ExtResource("10_vn8p4")]
 process_mode = 3
