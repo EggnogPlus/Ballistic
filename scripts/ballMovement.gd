@@ -14,23 +14,17 @@ var started_moving = false
 var death_timer = 0
 var death_limit = 3.5
 var death_displacement_radius = 50
-var reference_position: Vector2 = Vector2.ZERO  # Center of area
-
-# Glow properties
-var glow_radius: float = 12.5  # Radius of the glow circle (adjust to match player size)
-var glow_width: float = 3.0    # Thickness of the glow line
-var glow_color: Color = Color(1.0, 0.0, 0.0, 1.0)  # Red glow
-var glow_points: int = 32      # Number of points for circle approximation
+var reference_position: Vector2 = Vector2.ZERO
 
 # Trail properties
-var trail_length: float = 0.1 # Scale factor for trail lines (shorter than original 0.1)
-var trail_width: float = 3    # Width of trail lines
-var trail_offset: float = 5.0   # Offset distance for left/right lines
-var trail_dash_length: float = 4.0  # Length of dashes
-var trail_gap_length: float = 4.0   # Gap between dashes
+var trail_length: float = 0.1
+var trail_width: float = 3
+var trail_offset: float = 5.0
+var trail_dash_length: float = 4.0
+var trail_gap_length: float = 4.0
 var trail_color_slow: Color = Color(1.0, 1.0, 1.0, 1.0)  # white trail
 var trail_color_fast: Color = Color(1.0, 0.0, 0.0, 1.0)  # Red trail
-var trail_dash_offset: float = 3.0  # Forward/backward offset magnitude
+var trail_dash_offset: float = 3.0
 
 @onready var mesh_instance_2d: MeshInstance2D = $MeshInstance2D
 @onready var camera = get_viewport().get_camera_2d()
@@ -70,20 +64,16 @@ func _physics_process(delta):
 		grapple_drawer.queue_redraw()
 	else:
 		apply_movement(delta)
-
-	if not is_grappling:
 		if velocity.length() > 5:
 			velocity *= (1 - friction * delta * 30)
-
-	# Check for Debug mesh Modulation TODO add fire animation
+	
+	# Can execute if above threshold and not grappling
 	if velocity.length() > execute_threshold and not is_grappling:
 		can_execute = true
-		mesh_instance_2d.modulate = Color(1, 1, 1)
 	else:
 		can_execute = false
-		mesh_instance_2d.modulate = Color(1, 1, 1)
 	
-	# PLAYER INDICATOR TODO 
+	# Player Indicator of Dying
 	if started_moving and global_position:
 		if death_timer >= death_limit:
 			die()
@@ -94,9 +84,12 @@ func _physics_process(delta):
 				mesh_instance_2d.modulate = Color(0.5, 0.5, 0.5)
 			elif death_timer >= 0.5:
 				mesh_instance_2d.modulate = Color(0.8, 0.8, 0.8)
-
+	
+	# Calculate movement and Collisions
 	move_and_slide()
+	# Check calculated collisions for executing enemies
 	check_for_enemy_execution()
+	# After initally moving - check if standing still
 	if started_moving:
 		update_death_status(delta)
 	
@@ -107,7 +100,7 @@ func _draw():
 	if velocity.length() > 0:
 		var trail_color = trail_color_fast if can_execute else trail_color_slow
 		var velocity_scaled = velocity * trail_length
-		var trail_end = -velocity_scaled  # Trail behind the ball
+		var trail_end = -velocity_scaled  # Trail behind the ball - Opposite velocity vector
 		var perp_vector = Vector2(-velocity_scaled.y, velocity_scaled.x).normalized() * trail_offset
 		var dir = (trail_end - Vector2.ZERO).normalized()
 		
@@ -135,6 +128,7 @@ func _draw():
 
 #region Death & Execution AND apply_movement 
 
+## Enabling UI and stopping timer + enemy spawning 
 func die():
 	queue_free()
 	TimeOverlay.stop_timer()
@@ -142,14 +136,17 @@ func die():
 	EnemySpawner.CAN_SPAWN = false
 	GameOverMenu.visible = true
 
+## If stuck within area (set by death_displacement_radius) - increase death_timer
 func update_death_status(delta):
 	var distance = global_position.distance_to(reference_position)
 	if distance <= death_displacement_radius:
 		death_timer += delta
 	else:
 		death_timer = 0.0
-		reference_position = global_position
+		mesh_instance_2d.modulate = Color(1, 1, 1) # Reset Color
+		reference_position = global_position # Set new position as new "stuck area"
 
+## Check all collisions - if colliding with "enemies" and can_execute and not grappling -> execute + camera shake
 func check_for_enemy_execution():
 	for i in range(get_slide_collision_count()):
 		var collision = get_slide_collision(i)
@@ -161,7 +158,9 @@ func check_for_enemy_execution():
 				if camera and "start_shake" in camera:
 					camera.start_shake(8.0)
 
+## Movement function for rolling / not grappling
 func apply_movement(delta):
+	#region get User input as a combined Vector
 	var input_vector = Vector2.ZERO
 	if Input.is_action_pressed("ui_left"):
 		input_vector.x = -1
@@ -172,10 +171,13 @@ func apply_movement(delta):
 	elif Input.is_action_pressed("ui_down"):
 		input_vector.y = 1
 	input_vector = input_vector.normalized()
+	#endregion
+	
 	if input_vector != Vector2.ZERO:
-		started_moving = true
-		var input_force = input_vector * acceleration * delta
-		var new_velocity = velocity
+		started_moving = true # has started moving
+		var input_force = input_vector * acceleration * delta # from input vector (normalized) to force 
+		var new_velocity = velocity # variable to apply new forces to without directly affecting velocity YET
+		#region Cap Input force in direction over max_roll_speed 
 		if abs(velocity.x) < max_roll_speed:
 			new_velocity.x += input_force.x
 		if abs(velocity.y) < max_roll_speed:
@@ -188,10 +190,11 @@ func apply_movement(delta):
 				var perpendicular_component = input_direction - parallel_component
 				var adjusted_force = perpendicular_component * acceleration * delta
 				new_velocity = velocity + adjusted_force
-		velocity = new_velocity
+		velocity = new_velocity # Apply the new_velocity calculations to the velocity
 #endregion
 
 #region Grapple Functions
+## Get nearest grapple point (within range), set up vars between player and grapple point and draw grapple
 func activate_grapple():
 	var nearest_grapple = find_nearest_grapple_point()
 	if nearest_grapple:
@@ -203,17 +206,22 @@ func activate_grapple():
 	else:
 		pass
 
+## Movement function for Grappling
 func swing(delta):
 	started_moving = true
 	var direction_to_grapple = (self.grapple_point - self.global_position).normalized()
-	var current_distance = self.global_position.distance_to(self.grapple_point)
+	var current_distance = self.global_position.distance_to(self.grapple_point) 
 	if current_distance > self.grapple_max_distance:
+		# Restrict grapple radius to within the radius when first started the grapple
 		var correction_vector = (self.global_position - self.grapple_point).normalized() * (current_distance - self.grapple_max_distance)
 		self.global_position -= correction_vector
 		self.velocity -= correction_vector / delta
+	
 	var tangent_dir_1 = Vector2(-direction_to_grapple.y, direction_to_grapple.x)
 	var tangent_dir_2 = Vector2(direction_to_grapple.y, -direction_to_grapple.x)
+	# Check which direction ball heading and apply correct direction for swing force
 	var tangent_direction = tangent_dir_1 if self.velocity.dot(tangent_dir_1) > self.velocity.dot(tangent_dir_2) else tangent_dir_2
+	
 	var swing_force = tangent_direction * swing_strength * delta
 	self.velocity += swing_force
 
@@ -222,6 +230,7 @@ func release_grapple():
 	grapple_raycast_node.enabled = false
 	grapple_drawer.release_grapple()
 
+## Find nearest grapple point within grapple range
 func find_nearest_grapple_point():
 	var nearest = null
 	var min_distance = 250

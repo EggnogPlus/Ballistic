@@ -20,7 +20,6 @@ func _ready() -> void:
 
 func screen_on():
 	screen_saver_movement = true
-	#EnemySpawner.delete_all_enemies() DON'T DELETE WHEN SWITCHING FROM ABOUT
 	EnemySpawner.CAN_SPAWN = true
 	visible = true
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE

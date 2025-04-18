@@ -8,6 +8,7 @@ extends Control
 @onready var RespawnManager = get_node("../RespawnManager")
 @onready var TimeOverlay = get_node("../TimeOverlay")
 
+## Bool for if the time has been added to the game over screen yet
 var added_time = false
 
 # Called when the node enters the scene tree for the first time.
@@ -31,11 +32,12 @@ func on_qts_pressed():
 	start_menu.screen_on()
 	TimeOverlay.hide_time()
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+# Called every frame.
 func _process(delta: float) -> void:
 	if not added_time and visible:
 		TimeOverlay.visible = false
 		added_time = true
+		# Correctly formatted time from time_elapsed
 		var minutes = int(TimeOverlay.time_elapsed) / 60
 		var seconds = int(TimeOverlay.time_elapsed) % 60
 		var milliseconds = int((TimeOverlay.time_elapsed - int(TimeOverlay.time_elapsed)) * 100)

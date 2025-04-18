@@ -1,48 +1,38 @@
 extends CharacterBody2D
 
 var speed: float = 100.0
-var huntSpeed: float = 200.0
-var turnSpeed = 2.0
+var hunt_speed: float = 200.0
+var turn_speed = 2.0
 enum ENEMY_STATE {PATROLLING, # 0
 					 LOSING, # 1
 					 HUNTING, # 2
 					 BLIND_HUNT} # 3
 
 # Blind Hunt Variables
-var blindHuntTimer = 0
-var blindHuntLimit = 4
+var blind_hunt_timer = 0
+var blind_hunt_limit = 4
 
 # Patrolling variables
-var lastKnownLocation: Vector2
-var mustHaveBeenTheWind = 3.0
-var currentLostTime = 0.0
-
-var patrolTime = 0.0
-var maxPatrolTime = 3.0  # How long to move in one direction
-var target_direction: Vector2
+var last_known_location: Vector2
+var must_have_been_the_wind = 3.0
+var current_lost_time = 0.0
 
 #region All @onready vars 
-@onready var currentState = ENEMY_STATE.PATROLLING
-@onready var directionFacing: Vector2
+@onready var current_state = ENEMY_STATE.PATROLLING
 @onready var sprite = $Sprite2D 
-@onready var frontMarker = $Area2D/frontMarker
-@onready var visionCone = $Area2D
+@onready var front_marker = $Area2D/frontMarker
+@onready var vision_cone = $Area2D
 @onready var player = get_node_or_null("/root/Level/Player/ball")
-@onready var navigationAgent: NavigationAgent2D = $NavigationAgent2D
+@onready var navigation_agent: NavigationAgent2D = $NavigationAgent2D
 @onready var start_menu = get_node("../StartMenu")
 
 #endregion
 
 #region Get Direction w/ get_facing_direction, and hooks for entering / exiting vision code 
-## Sets the enemies "forward" direction to be the vec between the frontMarker and self
-func get_facing_direction() -> Vector2:
-	directionFacing = frontMarker.global_position - self.global_position
-	return directionFacing
-	
-## Runs once and hooks up player entering and exiting enemy visionCone plus wait for physics frame
+## Runs once and hooks up player entering and exiting enemy vision_cone plus wait for physics frame
 func _ready():
-	visionCone.connect("body_entered", Callable(self, "_on_body_entered"))
-	visionCone.connect("body_exited", Callable(self, "_on_body_exited"))
+	vision_cone.connect("body_entered", Callable(self, "_on_body_entered"))
+	vision_cone.connect("body_exited", Callable(self, "_on_body_exited"))
 	set_physics_process(false)
 	call_deferred("waitForPhysics")
 	
@@ -53,34 +43,35 @@ func waitForPhysics():
 
 ## function for when player ENTERS vision cone
 func _on_body_entered(body):
-	if body.name == "ball":  # Or however your player is named
-		currentState = ENEMY_STATE.HUNTING # 2
+	if body.name == "ball":
+		current_state = ENEMY_STATE.HUNTING # 2
 
 ## function for when player EXITS vision cone
 func _on_body_exited(body):
 	if body.name == "ball":
-		currentState = ENEMY_STATE.BLIND_HUNT # 3
+		current_state = ENEMY_STATE.BLIND_HUNT # 3
 #endregion
 
+## Sets new patrol target from a random angled far away point then cap it within the nav region 
 func set_new_patrol_target():
 	var max_distance := 3000
 	var random_offset = Vector2.RIGHT.rotated(randf_range(0, TAU)) * randf_range(300, max_distance)
 	var target = global_position + random_offset
-	var nav_map = navigationAgent.get_navigation_map()
-	var safe_point = NavigationServer2D.map_get_closest_point(nav_map, target)
-	navigationAgent.target_position = safe_point
+	var nav_map = navigation_agent.get_navigation_map()
+	var safe_point = NavigationServer2D.map_get_closest_point(nav_map, target) # Cap within navigation region
+	navigation_agent.target_position = safe_point
 
 #region State movements
 
 func patrolMovement(delta):
-	if navigationAgent.is_navigation_finished():
+	if navigation_agent.is_navigation_finished():
 		set_new_patrol_target()
 
-	var path = navigationAgent.get_current_navigation_path() # full path
-	var next_position = navigationAgent.get_next_path_position()
+	var path = navigation_agent.get_current_navigation_path() # full path
+	var next_position = navigation_agent.get_next_path_position() # next path "point"
 	
 	# Avoid other enemies
-	var enemies = get_tree().get_nodes_in_group("enemies")  # Assuming all enemies are in the "enemies" group
+	var enemies = get_tree().get_nodes_in_group("enemies")
 	var avoidance_vector = Vector2.ZERO
 	for enemy in enemies:
 		if enemy != self and global_position.distance_to(enemy.global_position) < 100:
@@ -95,23 +86,24 @@ func patrolMovement(delta):
 		set_new_patrol_target()
 		return
 		
-	# Avoid spinning if next dot is too close - avoid spinning
+	# Avoid spinning if next dot is too close
 	if path.size() > 1:
 		# If super close to next position - pick new target - wiggle solution
 		if global_position.distance_to(to_next) < 50:
 			set_new_patrol_target()
-
-	var target_angle = to_next.angle() + PI / 2
-	#rotation = lerp_angle(rotation, target_angle, turnSpeed * delta)
 	
+	var target_angle = to_next.angle() + PI / 2	
 	var angle_diff = abs(wrapf(rotation - target_angle, -PI, PI))
-	var effective_turn_speed = turnSpeed
+	var effective_turn_speed = turn_speed
+	
+	# Turn fasted if close to next path point
 	if global_position.distance_to(next_position) < 50:
 		effective_turn_speed *= 3
-
+	
+	# Smooth rotation
 	rotation = lerp_angle(rotation, target_angle, effective_turn_speed * delta)
 
-	# Only move if mostly facing the target
+	# Only move if mostly facing the target - avoid weird snaking
 	if angle_diff < 0.5:
 		velocity = Vector2.UP.rotated(rotation) * speed
 	else:
@@ -121,79 +113,75 @@ func patrolMovement(delta):
 	velocity = Vector2.UP.rotated(rotation) * speed
 	move_and_slide()
 
-func losingMovement(delta):
+func losingMovement(delta):	
 	# Move Toward Where player was last seen
-	navigationAgent.target_position = lastKnownLocation
+	navigation_agent.target_position = last_known_location
 	
-	# Move toward the next point along the path
-	var next_position = navigationAgent.get_next_path_position()
+	var next_position = navigation_agent.get_next_path_position()
 
-	#var next_position = navigationAgent.get_next_path_position()
 	var to_next = global_position.direction_to(next_position)
 	
 	# Smoothly rotate toward the next path point
 	var desired_angle = to_next.angle() + PI / 2
 	rotation = desired_angle
 
-	# Apply movement using rotation-based direction (if you want the old "Vector2.UP" style)
-	velocity = Vector2.UP.rotated(rotation) * huntSpeed
+	# Apply movement using rotation-based direction
+	velocity = Vector2.UP.rotated(rotation) * hunt_speed
 	
-	# Wait mustHaveBeenTheWind time before returning to patrol state
-	currentLostTime += delta
-	if currentLostTime >= mustHaveBeenTheWind:
+	# Wait must_have_been_the_wind time before returning to patrol state
+	current_lost_time += delta
+	if current_lost_time >= must_have_been_the_wind:
 		# Lost Player
-		currentState = ENEMY_STATE.PATROLLING
-		currentLostTime = 0
+		current_state = ENEMY_STATE.PATROLLING
+		current_lost_time = 0
 	else:
 		# Still searching
-		currentState = ENEMY_STATE.LOSING
-		
+		current_state = ENEMY_STATE.LOSING
 	
 	move_and_slide()
 
 func huntingMovement(delta):
 	if not player:
 		return
-
+	
 	# Update target destination
-	navigationAgent.target_position = player.global_position
+	navigation_agent.target_position = player.global_position
 	
-	# Continually update last locaiton
-	lastKnownLocation = player.global_position
+	# Continually update last locaiton for if "lost" player
+	last_known_location = player.global_position
 	
-	if navigationAgent.is_navigation_finished():
+	if navigation_agent.is_navigation_finished():
 		return
 	
 	# Move toward the next point along the path
-	var next_position = navigationAgent.get_next_path_position()
-
-	#var next_position = navigationAgent.get_next_path_position()
+	var next_position = navigation_agent.get_next_path_position()
+	
 	var to_next = global_position.direction_to(next_position)
 	
 	# Smoothly rotate toward the next path point
 	var desired_angle = to_next.angle() + PI / 2
 	rotation = desired_angle
-
-	# Apply movement using rotation-based direction (if you want the old "Vector2.UP" style)
-	velocity = Vector2.UP.rotated(rotation) * huntSpeed
+	
+	# Apply movement using rotation-based direction
+	velocity = Vector2.UP.rotated(rotation) * hunt_speed
 	
 	move_and_slide()
 
 func blindMovement(delta):
-	blindHuntTimer += delta
-	if (blindHuntTimer >= blindHuntLimit):
+	blind_hunt_timer += delta
+	if (blind_hunt_timer >= blind_hunt_limit):
 		# Lost Player
-		currentState = ENEMY_STATE.LOSING
-		blindHuntTimer = 0
+		current_state = ENEMY_STATE.LOSING
+		blind_hunt_timer = 0
 	else:
 		# Keep Hunting
 		huntingMovement(delta)
 
 #endregion
 
+## Function that calls the correct enemy movement function depenging on the state 
 func stateActions(delta):
-	get_facing_direction()
-	match currentState:
+	match current_state:
 		0: # PATROLLING
 			sprite.modulate = Color(1, 1, 1)
 			patrolMovement(delta)
@@ -215,10 +203,13 @@ func _physics_process(delta):
 		var possible_player = get_node_or_null("/root/Level/Player/ball")
 		if possible_player:
 			player = possible_player
-
+	
+	# Have enemies move if on Start/About page (screen saver patrolling) OR
+	# if player exists 
 	if start_menu.screen_saver_movement or (player and is_instance_valid(player)):
 		stateActions(delta)
 
+## remove from group to allow more spawning then free the node
 func execute():
 	if is_in_group("enemies"):
 		remove_from_group("enemies")
@@ -226,8 +217,8 @@ func execute():
 
 #region Draws Enemy Pathing --FYI drawn line does not dissapear
 #func _draw():
-	#if navigationAgent and not navigationAgent.is_navigation_finished():
-		#var path = navigationAgent.get_current_navigation_path()
+	#if navigation_agent and not navigation_agent.is_navigation_finished():
+		#var path = navigation_agent.get_current_navigation_path()
 #
 		#for i in range(path.size()):
 			## Draw circle at each path point in global space, converted to local

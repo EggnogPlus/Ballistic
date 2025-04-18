@@ -8,6 +8,9 @@ func _ready():
 	original_position = position  # Save the starting point
 
 func _process(delta):
+	# If start_shake called with an amount > 0 - apply shake amount to random direction vector
+	# lerp over time to decay shake effect and shake amount
+	# reset camera position once shake amount = 0
 	if shake_amount > 0:
 		position = original_position + Vector2(
 			randf_range(-1, 1),

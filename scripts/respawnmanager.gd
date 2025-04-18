@@ -33,5 +33,5 @@ func respawn_at(position: Vector2):
 	# Reconnect to GrappleDrawer
 	var grapple_drawer = player_node.get_node_or_null("GrappleDrawer")
 	if grapple_drawer:
-		grapple_drawer.ball = new_ball  # Assign the new ball (CharacterBody2D)
+		grapple_drawer.ball = new_ball  # Assign the new ball 
 		grapple_drawer.grapple_raycast_node = player_node.get_node_or_null("GrappleRaycast")

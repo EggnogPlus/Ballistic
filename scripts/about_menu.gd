@@ -1,13 +1,12 @@
 extends Control
 
 @onready var back_button = $NinePatchRect/VBoxContainer4/BackButton
-@onready var pause_menu = get_node("../PauseMenu")
+@onready var StartMenu = get_node("../StartMenu")
 @onready var bg = $NinePatchRect/ColorRect
 @onready var player = get_node("../Player")
 @onready var RespawnManager = get_node("../RespawnManager")
 @onready var EnemySpawner = get_node("../EnemySpawner")
 @onready var TimeOverlay = get_node("../TimeOverlay")
-@onready var start_menu = get_node("../StartMenu")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -20,10 +19,9 @@ func screen_on():
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var ball = get_node("/root/Level/Player/ball")
 	if ball:
-		ball.queue_free() # Remove ball child of player
+		ball.queue_free()
 	
-
-
+	
 func on_back_pressed():
 	visible = false
-	start_menu.screen_on()
+	StartMenu.screen_on()

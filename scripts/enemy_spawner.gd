@@ -14,14 +14,17 @@ func _process(delta):
 		timer = 0.0
 		spawn_enemy()
 
+# function to spawn a single enemy at a random spawn point
 func spawn_enemy():
 	var num_enemies = get_tree().get_nodes_in_group("enemies").size()
+	# If spawn points valid and not adding more than max and allowed to spawn enemies
 	if enemy_scene and spawn_points.size() > 0 and num_enemies < max_enemies and CAN_SPAWN:
 		var spawn_point = spawn_points.pick_random()
 		var enemy = enemy_scene.instantiate()
 		enemy.global_position = spawn_point.global_position
 		get_tree().current_scene.add_child(enemy)
 
+## function to remove all enemies in tree
 func delete_all_enemies():
 	var enemies = get_tree().get_nodes_in_group("enemies")
 	for enemy in enemies:

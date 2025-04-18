@@ -16,6 +16,7 @@ func _draw():
 	if is_grappling:
 		var local_ball_position = to_local(ball.global_position)
 		var local_grapple_point = to_local(grapple_point)
+		# Change values here to grapple color/size
 		draw_line(local_ball_position, local_grapple_point, Color.SILVER, 3.0)
 
 func release_grapple():
