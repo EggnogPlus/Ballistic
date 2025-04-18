@@ -141,7 +141,9 @@ func losingMovement(delta):
 	move_and_slide()
 
 func huntingMovement(delta):
+	# If player does not exist - return to patrolling
 	if not player:
+		current_state = ENEMY_STATE.PATROLLING
 		return
 	
 	# Update target destination
