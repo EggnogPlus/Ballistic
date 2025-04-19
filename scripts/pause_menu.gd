@@ -23,10 +23,14 @@ func toggle_pause():
 	visible = !is_paused
 	if is_paused:
 		print("Game unpaused")
+		if not start_menu.screen_saver_movement:
+			Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED_HIDDEN)
 	else:
 		print("Game paused")
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 func on_quit_to_start_pressed():
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	EnemySpawner.delete_all_enemies()
 	start_menu.screen_on()
 	TimeOverlay.hide_time()

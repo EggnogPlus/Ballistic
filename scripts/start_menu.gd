@@ -19,6 +19,7 @@ func _ready() -> void:
 	screen_on()
 
 func screen_on():
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	screen_saver_movement = true
 	EnemySpawner.CAN_SPAWN = true
 	visible = true
@@ -34,6 +35,7 @@ func screen_on():
 
 func on_play_pressed():
 	visible = false
+	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	screen_saver_movement = false
 	EnemySpawner.delete_all_enemies()
 	RespawnManager.respawn_at(Vector2(0, 0))

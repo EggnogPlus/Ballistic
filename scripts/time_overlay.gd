@@ -4,12 +4,13 @@ var time_elapsed := 0.0
 var is_running := false
 
 @onready var label = $VBoxContainer/RichTextLabel
+#@onready var ball = get_node("../Player/ball")
 
 func _ready() -> void:
 		visible = false
 
 func _process(delta):
-	if is_running:
+	if is_running and get_node("../Player/ball").started_moving:
 		time_elapsed += delta
 		update_display()
 

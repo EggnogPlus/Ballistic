@@ -163,7 +163,7 @@ func huntingMovement(delta):
 	# Smoothly rotate toward the next path point
 	var desired_angle = to_next.angle() + PI / 2
 	rotation = desired_angle
-	
+		
 	# Apply movement using rotation-based direction
 	velocity = Vector2.UP.rotated(rotation) * hunt_speed
 	

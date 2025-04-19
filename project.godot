@@ -10,14 +10,19 @@ config_version=5
 
 [application]
 
-config/name="Namen_Project"
+config/name="Ballistic"
 run/main_scene="res://scenes/level.tscn"
 config/features=PackedStringArray("4.3", "Mobile")
-config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0, 0, 0, 1)
+boot_splash/image="res://resources/enemy.png"
+boot_splash/fullsize=false
+config/icon="res://resources/enemy.png"
 
 [display]
 
+window/size/mode=3
 window/stretch/mode="canvas_items"
+mouse_cursor/custom_image="res://resources/mouse.png"
 
 [input]
 
