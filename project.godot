@@ -14,7 +14,7 @@ config/name="Ballistic"
 run/main_scene="res://scenes/level.tscn"
 config/features=PackedStringArray("4.3", "Mobile")
 boot_splash/bg_color=Color(0, 0, 0, 1)
-boot_splash/image="res://resources/enemy.png"
+boot_splash/image="res://resources/banner.png"
 boot_splash/fullsize=false
 config/icon="res://resources/enemy.png"
 
