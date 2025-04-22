@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://3efuv04qegl0"
 path.s3tc="res://.godot/imported/outerwall.png-0a6712b514b443af1d7934dda37743c0.s3tc.ctex"
+path.etc2="res://.godot/imported/outerwall.png-0a6712b514b443af1d7934dda37743c0.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://resources/outerwall.png"
-dest_files=["res://.godot/imported/outerwall.png-0a6712b514b443af1d7934dda37743c0.s3tc.ctex"]
+dest_files=["res://.godot/imported/outerwall.png-0a6712b514b443af1d7934dda37743c0.s3tc.ctex", "res://.godot/imported/outerwall.png-0a6712b514b443af1d7934dda37743c0.etc2.ctex"]
 
 [params]
 
