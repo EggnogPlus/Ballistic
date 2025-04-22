@@ -73,7 +73,7 @@ theme_override_font_sizes/normal_font_size = 18
 theme_override_font_sizes/bold_font_size = 22
 bbcode_enabled = true
 text = "[center][b] -- Controls -- [/b][/center]
-	 ←↑→↓		   -	Movement
+	ARROWS	   -	Movement
 	 SPACE		   -		Grapple"
 fit_content = true
 
